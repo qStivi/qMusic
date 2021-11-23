@@ -1,2 +1,18 @@
-# Project exclude paths
-/target/
+*/
+
+!src
+!src/**
+
+!.github
+!.github/*
+
+!.idea/runConfigurations
+!.idea/artifacts
+
+!.idea/misc.xml
+!.idea/modules.xml
+!.idea/vcs.xml
+
+*.db
+*.jar
+*.env

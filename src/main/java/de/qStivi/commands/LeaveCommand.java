@@ -1,8 +1,11 @@
 package de.qStivi.commands;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
+
+import java.time.Duration;
 
 public class LeaveCommand implements ICommand {
 
@@ -17,7 +20,7 @@ public class LeaveCommand implements ICommand {
 
         event.getGuild().getAudioManager(); //TODO why?
         event.getGuild().getAudioManager().closeAudioConnection();
-        event.getHook().editOriginal("Bye Bye").queue();
+        event.getHook().editOriginal("Bye Bye").delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
     }
 
     @Override

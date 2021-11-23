@@ -22,6 +22,6 @@ public class Command {
 
         getLogger(CommandHandler.class).info(event.getUser().getAsTag() + " used /" + command.getName());
 
-        System.gc(); // Because Memory usage gets crazy after a while
+//        System.gc(); // Because Memory usage gets crazy after a while
     }
 }

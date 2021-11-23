@@ -37,7 +37,7 @@ public class PlayCommand implements ICommand {
         return str;
     }
 
-    public String playSong(OptionMapping optionMapping, boolean shuffle, TextChannel channel, Guild guild, SlashCommandEvent event) throws IOException, ParseException, SpotifyWebApiException {
+    public String playSong(OptionMapping optionMapping, boolean shuffle, TextChannel channel, Guild guild, SlashCommandEvent event) throws IOException, ParseException, SpotifyWebApiException, InterruptedException {
 
         var song = optionMapping.getAsString().trim();
 
@@ -83,7 +83,7 @@ public class PlayCommand implements ICommand {
         return null;
     }
 
-    private String playSpotifyPlaylist(String arg0, Boolean shuffle, TextChannel channel) throws IOException, ParseException, SpotifyWebApiException {
+    private String playSpotifyPlaylist(String arg0, Boolean shuffle, TextChannel channel) throws IOException, ParseException, SpotifyWebApiException, InterruptedException {
 
         String id = null;
         if (arg0.startsWith("spotify:playlist:")) {
@@ -98,7 +98,7 @@ public class PlayCommand implements ICommand {
             id = temp.split("\\?")[0];
         }
 
-        var playlist = new Spotify().getPlaylist(id);
+        var playlist = new Spotify().getFormattedPlaylist(id);
         if (shuffle) Collections.shuffle(playlist);
         for (String link : playlist) {
             searchPlay(link, channel);
@@ -196,7 +196,7 @@ public class PlayCommand implements ICommand {
     @Override
     public void handle(SlashCommandEvent event) {
         var hook = event.getHook();
-        if (!join(event.getGuild(), event.getUser())) {
+        if (!join(event.getGuild(), event.getMember())) {
             hook.editOriginal("Please join a channel, so I can play your request.").queue();
             return;
         }
