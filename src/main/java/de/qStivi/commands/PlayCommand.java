@@ -99,7 +99,7 @@ public class PlayCommand implements ICommand {
         }
 
         var playlist = new Spotify().getFormattedPlaylist(id);
-        if (shuffle) Collections.shuffle(playlist);
+        if (shuffle) Collections.shuffle(Collections.singletonList(playlist));
         for (String link : playlist) {
             searchPlay(link, channel);
         }

@@ -8,6 +8,7 @@ import de.qStivi.listener.Listener;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
 
@@ -26,8 +27,9 @@ public class Bot {
     public static void main(String[] args) throws LoginException {
         var shardManager = DefaultShardManagerBuilder.createLight(Config.get("TOKEN"))
                 .addEventListeners(new EventsPreprocessor(), new Listener(), ControlsManager.getINSTANCE())
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES)
+                .setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
                 .enableCache(CacheFlag.VOICE_STATE)
+                .setMemberCachePolicy(MemberCachePolicy.VOICE)
                 .build();
 
         List<CommandData> commandDataList = new ArrayList<>();

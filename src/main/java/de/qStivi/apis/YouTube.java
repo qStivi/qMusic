@@ -60,6 +60,7 @@ public class YouTube {
                 sb.append((char) cp);
             }
             String jsonText = sb.toString();
+            rd.close();
             return new JSONObject(jsonText);
         }
     }
