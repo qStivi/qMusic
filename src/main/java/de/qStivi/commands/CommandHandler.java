@@ -32,6 +32,7 @@ public class CommandHandler implements ISlashCommandEvent {
         COMMAND_LIST.add(new JoinCommand());
         COMMAND_LIST.add(new LeaveCommand());
         COMMAND_LIST.add(new PlayCommand());
+        COMMAND_LIST.add(new TestCommand());
 
         var timer = new Timer();
 

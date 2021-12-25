@@ -4,7 +4,6 @@ import de.qStivi.commands.CommandHandler;
 import de.qStivi.commands.ICommand;
 import de.qStivi.listener.ControlsManager;
 import de.qStivi.listener.EventsPreprocessor;
-import de.qStivi.listener.Listener;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -26,7 +25,7 @@ public class Bot {
 
     public static void main(String[] args) throws LoginException {
         var shardManager = DefaultShardManagerBuilder.createLight(Config.get("TOKEN"))
-                .addEventListeners(new EventsPreprocessor(), new Listener(), ControlsManager.getINSTANCE())
+                .addEventListeners(new EventsPreprocessor(), ControlsManager.getINSTANCE())
                 .setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
                 .enableCache(CacheFlag.VOICE_STATE)
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)

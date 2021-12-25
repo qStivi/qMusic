@@ -105,7 +105,7 @@ public class ControlsManager extends ListenerAdapter {
                     embed.setFooter(null);
                 }
 
-                msg.editMessage(embed.build()).queue();
+                msg.editMessageEmbeds(embed.build()).queue();
             }
         };
     }
