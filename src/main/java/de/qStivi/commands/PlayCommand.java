@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
-import java.text.Normalizer;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,13 +28,6 @@ public class PlayCommand implements ICommand {
 
     private static final Logger logger = getLogger(PlayCommand.class);
 
-    public static String cleanForURL(String str) {
-        str = Normalizer.normalize(str, Normalizer.Form.NFKD);
-        str = str.replaceAll("[^a-z0-9A-Z +-]", ""); // Remove all non valid chars
-        str = str.replaceAll(" {2}", " ").trim(); // convert multiple spaces into one space
-        str = str.replaceAll(" ", "+"); //Replace spaces by dashes
-        return str;
-    }
 
     public String playSong(OptionMapping optionMapping, boolean shuffle, TextChannel channel, Guild guild, SlashCommandEvent event) throws IOException, ParseException, SpotifyWebApiException, InterruptedException {
 
@@ -176,7 +168,7 @@ public class PlayCommand implements ICommand {
     }
 
     private String searchPlay(String search, TextChannel channel) throws IOException {
-        search = cleanForURL(search);
+        search = Util.cleanForURL(search);
         String id = YouTube.getVideoIdBySearchQuery(search);
         String link = "https://youtu.be/" + id;
         PlayerManager.getINSTANCE().loadAndPlay(channel.getGuild(), link);

@@ -1,8 +1,11 @@
 package de.qStivi.apis;
 
 import de.qStivi.Config;
+import de.qStivi.Util;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,47 +14,77 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class YouTube {
 
     private static final String SECRET = Config.get("YOUTUBE_KEY");
+    private static final Logger LOGGER = LoggerFactory.getLogger(YouTube.class);
 
     /**
-     * @param searchQuery A search query in form of a {@link String} like one you would do on de.qStivi.APIs.YouTube.
-     * @return {@link String} – The video ID of the first video displayed on de.qStivi.APIs.YouTube using the given search query.
-     * @throws IOException Signals that an I/O exception of some sort has occurred. This class is the general class of exceptions produced by failed or interrupted I/O operations.
+     * Gets the id of the first video found given a specific search query.
+     *
+     * @param searchQuery something you want to search on YouTube
+     * @return the video id
      */
-    public static String getVideoIdBySearchQuery(String searchQuery) throws IOException {
+    public static String getVideoIdBySearchQuery(String searchQuery) {
+        if (searchQuery == null || searchQuery.isEmpty() || searchQuery.equals(" ")) {
+            LOGGER.error("YouTube search query null or empty!");
+            return null;
+        }
+        searchQuery = Util.cleanForURL(searchQuery);
         String query = "https://youtube.googleapis.com/youtube/v3/search?part=id&maxResults=1&q=" + searchQuery + "&safeSearch=none&type=video&key=" + SECRET;
         JSONObject jsonObject = readJsonFromUrl(query);
-        return jsonObject.getJSONArray("items").getJSONObject(0).getJSONObject("id").getString("videoId");
-    }
-
-    /**
-     * @param link The link to a de.qStivi.APIs.YouTube playlist in form of a {@link String}.
-     * @return Returns a {@link List<>} of {@link String} containing all IDs of the given playlist.
-     * @throws IOException Signals that an I/O exception of some sort has occurred. This class is the general class of exceptions produced by failed or interrupted I/O operations.
-     */
-    public static List<String> getPlaylistItemsByLink(String link) throws IOException {
-        String[] strings = link.split("list=");
-        String id = strings[1];
-        String query = "https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=" + id + "&key=" + SECRET;
-        JSONObject jsonObject = readJsonFromUrl(query);
-        JSONArray items = jsonObject.getJSONArray("items");
-        List<String> videoIds = new ArrayList<>();
-        for (int i = 0; i < items.length(); i++) {
-            videoIds.add(items.getJSONObject(i).getJSONObject("contentDetails").getString("videoId"));
+        if (jsonObject == null) {
+            LOGGER.error("Error while reading jason file!");
+            return null;
         }
-        return videoIds;
+        String id = jsonObject.getJSONArray("items").getJSONObject(0).getJSONObject("id").getString("videoId");
+        LOGGER.info(id);
+        return id;
     }
 
     /**
-     * @param url The URL to a JSON file in form of a {@link String}.
-     * @return {@link JSONObject} – The contents of the JSON file.
-     * @throws IOException Signals that an I/O exception of some sort has occurred. This class is the general class of exceptions produced by failed or interrupted I/O operations.
+     * Gets all video IDs in a playlist.
+     *
+     * @param link like of the playlist
+     * @return {@link List} of video IDs
      */
-    public static JSONObject readJsonFromUrl(String url) throws IOException {
+    public static List<String> getPlaylistItemsByLink(String link) {
+        try {
+            String[] strings = link.split("list=");
+            String id = strings[1];
+            String query = "https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=" + id + "&key=" + SECRET;
+            JSONObject jsonObject = readJsonFromUrl(query);
+            if (jsonObject == null) {
+                LOGGER.error("Error while reading jason file!");
+                return null;
+            }
+            JSONArray items = jsonObject.getJSONArray("items");
+            List<String> videoIds = new ArrayList<>();
+            for (int i = 0; i < items.length(); i++) {
+                videoIds.add(items.getJSONObject(i).getJSONObject("contentDetails").getString("videoId"));
+            }
+            if (videoIds.isEmpty()) {
+                LOGGER.error("Playlist is empty!");
+                return null;
+            }
+            LOGGER.info(String.valueOf(videoIds));
+            return videoIds;
+        } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
+            LOGGER.error(Arrays.deepToString(e.getStackTrace()));
+            return null;
+        }
+    }
+
+    /**
+     * Gets the json object provided by the link.
+     *
+     * @param url link to json object
+     * @return {@link JSONObject}
+     */
+    public static JSONObject readJsonFromUrl(String url) {
         try (InputStream is = new URL(url).openStream()) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
@@ -62,6 +95,9 @@ public class YouTube {
             String jsonText = sb.toString();
             rd.close();
             return new JSONObject(jsonText);
+        } catch (IOException e) {
+            LOGGER.error(Arrays.deepToString(e.getStackTrace()));
         }
+        return null;
     }
 }

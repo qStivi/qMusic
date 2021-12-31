@@ -14,6 +14,7 @@ import se.michaelthelin.spotify.model_objects.specification.Track;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class Spotify {
@@ -51,15 +52,19 @@ public class Spotify {
     @org.jetbrains.annotations.Nullable
     @CheckForNull
     public String getTrackName(String id) {
-        if (id == null || id.isEmpty()) return null;
+        if (id == null || id.isEmpty()) {
+            LOGGER.error("Spotify id null or empty!");
+            return null;
+        }
         final Track track;
         try {
             track = API.getTrack(id).build().execute();
         } catch (Exception e) {
+            LOGGER.error(Arrays.deepToString(e.getStackTrace()));
             return null;
         }
         final var name = track.getName();
-        LOGGER.info("Got Sptify track name: " + name);
+        LOGGER.info("Got Spotify track name: " + name);
         return name;
     }
 
@@ -72,11 +77,15 @@ public class Spotify {
      * @return String[] - containing the name of the corresponding Song. Or NULL when an error acures such when the id is empty.
      */
     public String[] getTrackArtists(String id) {
-        if (id == null || id.isEmpty()) return null;
+        if (id == null || id.isEmpty()) {
+            LOGGER.error("Track id null or empty!");
+            return null;
+        }
         final ArtistSimplified[] artistsSimplified;
         try {
             artistsSimplified = API.getTrack(id).build().execute().getArtists();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
+            LOGGER.error(Arrays.deepToString(e.getStackTrace()));
             return null;
         }
         var names = new String[artistsSimplified.length];
@@ -84,6 +93,7 @@ public class Spotify {
             ArtistSimplified artistSimplified = artistsSimplified[i];
             names[i] = artistSimplified.getName();
         }
+        LOGGER.info(Arrays.deepToString(names));
         return names;
     }
 
@@ -95,12 +105,15 @@ public class Spotify {
      */
     // https://developer.spotify.com/console/get-playlist-tracks/?playlist_id=3cEYpjA9oz9GiPac4AsH4n&market=ES&fields=items(added_by.id%2Ctrack(name%2Chref%2Calbum(name%2Chref)))&limit=10&offset=5&additional_types=
     public String[] getFormattedPlaylist(String id) {
-        if (id == null || id.isEmpty()) return null;
+        if (id == null || id.isEmpty()) {
+            LOGGER.error("Spotify id null or empty!");
+            return null;
+        }
         PlaylistTrack[] tracks;
         try {
             tracks = API.getPlaylist(id).build().execute().getTracks().getItems();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
-            LOGGER.info("Error while trying to get tracks for playlist id: " + id);
+            LOGGER.info(Arrays.deepToString(e.getStackTrace()));
             return null;
         }
         var output = new String[tracks.length];
@@ -113,7 +126,7 @@ public class Spotify {
             }
             output[i] = tracks[i].getTrack().getName() + artistsCombined;
         }
-
+        LOGGER.info(Arrays.deepToString(output));
         return output;
     }
 }
