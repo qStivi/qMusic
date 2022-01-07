@@ -4,7 +4,7 @@ import de.qStivi.Util;
 import de.qStivi.apis.Spotify;
 import de.qStivi.apis.YouTube;
 import de.qStivi.audio.PlayerManager;
-import de.qStivi.listener.ControlsManager;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.hc.core5.http.ParseException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -46,59 +47,20 @@ public class PlayCommand implements ICommand {
         } else if (requestType == RequestType.SPOTIFY) {
             SpotifyType spotifyType = getSpotifyType(song);
             if (spotifyType != null) {
-                switch (spotifyType) {
-                    case TRACK -> song = playSpotifyTrack(song, channel);
-                    case PLAYLIST -> song = playSpotifyPlaylist(song, shuffle, channel);
-                    case ALBUM -> song = playSpotifyAlbum(song, shuffle);
-                    case ARTIST -> song = playSpotifyArtist(song, shuffle);
+                if (spotifyType == SpotifyType.TRACK) {
+                    song = playSpotifyTrack(song, channel);
                 }
             }
         } else if (requestType == RequestType.SEARCH) {
             song = searchPlay(song, channel);
         }
-        if (song != null) ControlsManager.getINSTANCE().sendMessage(event, guild);
+//        if (song != null) ControlsManager.getINSTANCE().sendMessage(event, guild);
+
 
         return song;
     }
 
-    private String playSpotifyArtist(String arg0, Boolean shuffle) {
-
-        logger.info(arg0 + shuffle);
-        logger.error("NOT YET IMPLEMENTED!");
-        return null;
-    }
-
-    private String playSpotifyAlbum(String arg0, Boolean shuffle) {
-
-        logger.info(arg0 + shuffle);
-        logger.error("NOT YET IMPLEMENTED!");
-        return null;
-    }
-
-    private String playSpotifyPlaylist(String arg0, Boolean shuffle, TextChannel channel) throws IOException, ParseException, SpotifyWebApiException, InterruptedException {
-
-        String id = null;
-        if (arg0.startsWith("spotify:playlist:")) {
-            id = arg0.split(":")[2];
-        }
-        if (arg0.startsWith("open.spotify.com/playlist/")) {
-            var temp = arg0.split("/")[2];
-            id = temp.split("\\?")[0];
-        }
-        if (arg0.startsWith("https://open.spotify.com/playlist/")) {
-            var temp = arg0.split("/")[4];
-            id = temp.split("\\?")[0];
-        }
-
-        var playlist = new Spotify().getFormattedPlaylist(id);
-        if (shuffle) Collections.shuffle(Collections.singletonList(playlist));
-        for (String link : playlist) {
-            searchPlay(link, channel);
-        }
-        return arg0;
-    }
-
-    private String playSpotifyTrack(String link, TextChannel channel) throws IOException, ParseException, SpotifyWebApiException {
+    private String playSpotifyTrack(String link, TextChannel channel) {
 
         if (link.contains("open.spotify.com/track/")) {
             link = link.replace("https://", "");
@@ -127,7 +89,7 @@ public class PlayCommand implements ICommand {
         return null;
     }
 
-    private String playYoutubePlaylist(String link, Boolean randomizeOrder, TextChannel channel) throws IOException {
+    private String playYoutubePlaylist(String link, Boolean randomizeOrder, TextChannel channel) {
 
         List<String> ids = YouTube.getPlaylistItemsByLink(link);
         if (randomizeOrder) Collections.shuffle(ids);
@@ -167,7 +129,7 @@ public class PlayCommand implements ICommand {
         return null;
     }
 
-    private String searchPlay(String search, TextChannel channel) throws IOException {
+    private String searchPlay(String search, TextChannel channel) {
         search = Util.cleanForURL(search);
         String id = YouTube.getVideoIdBySearchQuery(search);
         String link = "https://youtu.be/" + id;
@@ -178,11 +140,7 @@ public class PlayCommand implements ICommand {
     @NotNull
     @Override
     public CommandData getCommand() {
-        return new CommandData(getName(), getDescription())
-                .addOptions(
-                        new OptionData(OptionType.STRING, "query", "Link or search query to some music.")
-                                .setRequired(true),
-                        new OptionData(OptionType.BOOLEAN, "shuffle", "Do you want the playlist to be shuffled?"));
+        return new CommandData(getName(), getDescription()).addOptions(new OptionData(OptionType.STRING, "query", "Link or search query to some music.").setRequired(true), new OptionData(OptionType.BOOLEAN, "shuffle", "Do you want the playlist to be shuffled?"));
     }
 
     @Override
@@ -200,7 +158,12 @@ public class PlayCommand implements ICommand {
 //            } else {
             var msg = playSong(event.getOptions().get(0), true, event.getTextChannel(), event.getGuild(), event);
             if (msg != null) {
-                hook.editOriginal(msg).queue();
+                if (PlayerManager.getINSTANCE().isRepeating(event.getGuild())) {
+                    hook.editOriginal(msg + "\nCurrent song **__IS__** currently being **__REPEATED__**!").queue();
+                } else {
+                    hook.editOriginal(msg).queue();
+                }
+                hook.editOriginalComponents().setActionRow(Button.primary("play", Emoji.fromMarkdown("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromMarkdown("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromMarkdown("<:stop:929130911382007848>")), Button.primary("repeat", Emoji.fromMarkdown("<:repeat:929131670941089864>")), Button.primary("skip", Emoji.fromMarkdown("<:skip:929131670660067370>"))).queue();
             } else {
 
                 hook.editOriginal("Something went wrong!").queue();
@@ -225,20 +188,14 @@ public class PlayCommand implements ICommand {
     }
 
     private enum RequestType {
-        YOUTUBE,
-        SPOTIFY,
-        SEARCH
+        YOUTUBE, SPOTIFY, SEARCH
     }
 
     private enum YoutubeType {
-        TRACK,
-        PLAYLIST
+        TRACK, PLAYLIST
     }
 
     private enum SpotifyType {
-        TRACK,
-        PLAYLIST,
-        ALBUM,
-        ARTIST
+        TRACK, PLAYLIST, ALBUM, ARTIST
     }
 }

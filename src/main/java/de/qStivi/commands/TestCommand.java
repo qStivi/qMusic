@@ -1,6 +1,5 @@
 package de.qStivi.commands;
 
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
@@ -15,12 +14,13 @@ public class TestCommand implements ICommand {
 
     @Override
     public void handle(SlashCommandEvent event) {
-        var hoock = event.getHook();
+        var hook = event.getHook();
+        hook.sendMessage("test").complete();
         var sm = SelectionMenu.create("myID");
-        sm.addOption("Label", "Value", "Desc.", Emoji.fromMarkdown(":upside_down:"));
-        sm.addOption("yee", "yee", "yee", Emoji.fromMarkdown(":yee:"));
+        sm.addOption("Label", "Value", "Desc.");
+        sm.addOption("yee", "yee", "yee");
         sm.setPlaceholder("Placeholder");
-        hoock.editOriginalComponents().setActionRow(sm.build()).queue();
+        hook.editOriginalComponents().setActionRow(sm.build()).queue();
     }
 
     @NotNull

@@ -4,10 +4,13 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
 public class LeaveCommand implements ICommand {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @NotNull
     @Override
@@ -17,8 +20,11 @@ public class LeaveCommand implements ICommand {
 
     @Override
     public void handle(SlashCommandEvent event) {
-
-        event.getGuild().getAudioManager(); //TODO why?
+        var g = event.getGuild();
+        if (g == null) {
+            logger.error("Guild was null!");
+            return;
+        }
         event.getGuild().getAudioManager().closeAudioConnection();
         event.getHook().editOriginal("Bye Bye").delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
     }

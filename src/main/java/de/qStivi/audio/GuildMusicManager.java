@@ -6,17 +6,15 @@ import net.dv8tion.jda.api.audio.AudioSendHandler;
 
 public class GuildMusicManager {
 
-    public final AudioPlayer audioPlayer;
-
     public final TrackScheduler trackScheduler;
 
     private final AudioSendHandler audioSendHandler;
 
     public GuildMusicManager(AudioPlayerManager audioPlayerManager) {
-        this.audioPlayer = audioPlayerManager.createPlayer();
-        this.trackScheduler = new TrackScheduler(this.audioPlayer);
-        this.audioPlayer.addListener(this.trackScheduler);
-        this.audioSendHandler = new AudioPlayerSendHandler(this.audioPlayer);
+        AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
+        this.trackScheduler = new TrackScheduler(audioPlayer);
+        audioPlayer.addListener(this.trackScheduler);
+        this.audioSendHandler = new MyAudioSendHandler(audioPlayer);
     }
 
     public AudioSendHandler getAudioSendHandler() {

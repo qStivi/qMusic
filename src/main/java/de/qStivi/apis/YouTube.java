@@ -2,6 +2,7 @@ package de.qStivi.apis;
 
 import de.qStivi.Config;
 import de.qStivi.Util;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class YouTube {
      * @param searchQuery something you want to search on YouTube
      * @return the video id
      */
+    @Nullable
     public static String getVideoIdBySearchQuery(String searchQuery) {
         if (searchQuery == null || searchQuery.isEmpty() || searchQuery.equals(" ")) {
             LOGGER.error("YouTube search query null or empty!");
@@ -51,6 +53,7 @@ public class YouTube {
      * @param link like of the playlist
      * @return {@link List} of video IDs
      */
+    @Nullable
     public static List<String> getPlaylistItemsByLink(String link) {
         try {
             String[] strings = link.split("list=");
@@ -84,6 +87,7 @@ public class YouTube {
      * @param url link to json object
      * @return {@link JSONObject}
      */
+    @Nullable
     public static JSONObject readJsonFromUrl(String url) {
         try (InputStream is = new URL(url).openStream()) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));

@@ -3,6 +3,7 @@ package de.qStivi.apis;
 
 import de.qStivi.Config;
 import org.apache.hc.core5.http.ParseException;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -11,8 +12,6 @@ import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -20,24 +19,24 @@ import java.util.List;
 public class Spotify {
     private static final String CLIENT_ID = Config.get("SPOTIFY_ID");
     private static final String CLIENT_SECRET = Config.get("SPOTIFY_SECRET");
-    private static final SpotifyApi API = new SpotifyApi.Builder()
-            .setClientId(CLIENT_ID)
-            .setClientSecret(CLIENT_SECRET)
-            .build();
-    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    private static final SpotifyApi API = new SpotifyApi.Builder().setClientId(CLIENT_ID).setClientSecret(CLIENT_SECRET).build();
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Initializes the Spotify API.
      * <p>
      * Verifies that all credentials are right.
      */
-    public Spotify() throws IOException, SpotifyWebApiException, ParseException {
-        final var clientCredentialsRequest = API.clientCredentials().build();
-        final var clientCredentials = clientCredentialsRequest.execute();
+    public Spotify() {
+        try {
+            var clientCredentialsRequest = API.clientCredentials().build();
+            var clientCredentials = clientCredentialsRequest.execute();
+            API.setAccessToken(clientCredentials.getAccessToken());
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            logger.error(Arrays.deepToString(e.getStackTrace()));
+        }
 
-        API.setAccessToken(clientCredentials.getAccessToken());
-
-        LOGGER.info("Spotify loaded!");
+        logger.info("Spotify loaded!");
     }
 
     /**
@@ -49,22 +48,20 @@ public class Spotify {
      * @return String containing the name of the corresponding Song. Or NULL when an error acures such as when the id is empty or NULL.
      */
     @Nullable
-    @org.jetbrains.annotations.Nullable
-    @CheckForNull
     public String getTrackName(String id) {
         if (id == null || id.isEmpty()) {
-            LOGGER.error("Spotify id null or empty!");
+            logger.error("Spotify id null or empty!");
             return null;
         }
         final Track track;
         try {
             track = API.getTrack(id).build().execute();
         } catch (Exception e) {
-            LOGGER.error(Arrays.deepToString(e.getStackTrace()));
+            logger.error(Arrays.deepToString(e.getStackTrace()));
             return null;
         }
         final var name = track.getName();
-        LOGGER.info("Got Spotify track name: " + name);
+        logger.info("Got Spotify track name: " + name);
         return name;
     }
 
@@ -76,16 +73,17 @@ public class Spotify {
      * @param id The track id which is included in the song link and the Spotify URI.
      * @return String[] - containing the name of the corresponding Song. Or NULL when an error acures such when the id is empty.
      */
+    @Nullable
     public String[] getTrackArtists(String id) {
         if (id == null || id.isEmpty()) {
-            LOGGER.error("Track id null or empty!");
+            logger.error("Track id null or empty!");
             return null;
         }
         final ArtistSimplified[] artistsSimplified;
         try {
             artistsSimplified = API.getTrack(id).build().execute().getArtists();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            LOGGER.error(Arrays.deepToString(e.getStackTrace()));
+            logger.error(Arrays.deepToString(e.getStackTrace()));
             return null;
         }
         var names = new String[artistsSimplified.length];
@@ -93,7 +91,7 @@ public class Spotify {
             ArtistSimplified artistSimplified = artistsSimplified[i];
             names[i] = artistSimplified.getName();
         }
-        LOGGER.info(Arrays.deepToString(names));
+        logger.info(Arrays.deepToString(names));
         return names;
     }
 
@@ -104,16 +102,17 @@ public class Spotify {
      * @return A {@link List<String>} of Strings.
      */
     // https://developer.spotify.com/console/get-playlist-tracks/?playlist_id=3cEYpjA9oz9GiPac4AsH4n&market=ES&fields=items(added_by.id%2Ctrack(name%2Chref%2Calbum(name%2Chref)))&limit=10&offset=5&additional_types=
+    @Nullable
     public String[] getFormattedPlaylist(String id) {
         if (id == null || id.isEmpty()) {
-            LOGGER.error("Spotify id null or empty!");
+            logger.error("Spotify id null or empty!");
             return null;
         }
         PlaylistTrack[] tracks;
         try {
             tracks = API.getPlaylist(id).build().execute().getTracks().getItems();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
-            LOGGER.info(Arrays.deepToString(e.getStackTrace()));
+            logger.info(Arrays.deepToString(e.getStackTrace()));
             return null;
         }
         var output = new String[tracks.length];
@@ -126,7 +125,7 @@ public class Spotify {
             }
             output[i] = tracks[i].getTrack().getName() + artistsCombined;
         }
-        LOGGER.info(Arrays.deepToString(output));
+        logger.info(Arrays.deepToString(output));
         return output;
     }
 }
