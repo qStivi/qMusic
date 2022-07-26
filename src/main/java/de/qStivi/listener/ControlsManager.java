@@ -1,15 +1,16 @@
 package de.qStivi.listener;
 
 import de.qStivi.audio.PlayerManager;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class ControlsManager extends ListenerAdapter {
+
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         var type = Objects.requireNonNull(event.getButton()).getId();
         var guild = event.getGuild();
         var pm = PlayerManager.getINSTANCE();

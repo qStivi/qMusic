@@ -1,6 +1,6 @@
 package de.qStivi.commands;
 
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandHandler extends ListenerAdapter {
+
     public static final List<ICommand> COMMAND_LIST = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -26,8 +27,9 @@ public class CommandHandler extends ListenerAdapter {
         COMMAND_LIST.add(new TestCommand());
     }
 
+
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         event.deferReply().queue();
         for (var command : COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {

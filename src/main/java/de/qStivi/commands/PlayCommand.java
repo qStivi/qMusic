@@ -4,21 +4,19 @@ import de.qStivi.Util;
 import de.qStivi.apis.Spotify;
 import de.qStivi.apis.YouTube;
 import de.qStivi.audio.PlayerManager;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.Button;
-import org.apache.hc.core5.http.ParseException;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +28,7 @@ public class PlayCommand implements ICommand {
     private static final Logger logger = getLogger(PlayCommand.class);
 
 
-    public String playSong(OptionMapping optionMapping, boolean shuffle, TextChannel channel, Guild guild, SlashCommandEvent event) throws IOException, ParseException, SpotifyWebApiException, InterruptedException {
+    public String playSong(OptionMapping optionMapping, boolean shuffle, TextChannel channel, Guild guild, SlashCommandInteractionEvent event) {
 
         var song = optionMapping.getAsString().trim();
 
@@ -54,7 +52,6 @@ public class PlayCommand implements ICommand {
         } else if (requestType == RequestType.SEARCH) {
             song = searchPlay(song, channel);
         }
-//        if (song != null) ControlsManager.getINSTANCE().sendMessage(event, guild);
 
 
         return song;
@@ -140,11 +137,11 @@ public class PlayCommand implements ICommand {
     @NotNull
     @Override
     public CommandData getCommand() {
-        return new CommandData(getName(), getDescription()).addOptions(new OptionData(OptionType.STRING, "query", "Link or search query to some music.").setRequired(true), new OptionData(OptionType.BOOLEAN, "shuffle", "Do you want the playlist to be shuffled?"));
+        return Commands.slash(getName(), getDescription()).addOptions(new OptionData(OptionType.STRING, "query", "Link or search query to some music.").setRequired(true), new OptionData(OptionType.BOOLEAN, "shuffle", "Do you want the playlist to be shuffled?"));
     }
 
     @Override
-    public void handle(SlashCommandEvent event) {
+    public void handle(SlashCommandInteractionEvent event) {
         var hook = event.getHook();
         if (!join(event.getGuild(), event.getMember())) {
             hook.editOriginal("Please join a channel, so I can play your request.").queue();
@@ -156,16 +153,21 @@ public class PlayCommand implements ICommand {
 //                    hook.sendMessage(playSong(event.getOption("query").getAsString(), true, event.getTextChannel(), event.getGuild())).queue();
 //                }
 //            } else {
-            var msg = playSong(event.getOptions().get(0), true, event.getTextChannel(), event.getGuild(), event);
+            var msg = playSong(event.getOptions().get(0), true, event.getChannel().asTextChannel(), event.getGuild(), event);
             if (msg != null) {
                 if (PlayerManager.getINSTANCE().isRepeating(event.getGuild())) {
                     hook.editOriginal(msg + "\nCurrent song **__IS__** currently being **__REPEATED__**!").queue();
                 } else {
                     hook.editOriginal(msg).queue();
                 }
-                hook.editOriginalComponents().setActionRow(Button.primary("play", Emoji.fromMarkdown("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromMarkdown("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromMarkdown("<:stop:929130911382007848>")), Button.primary("repeat", Emoji.fromMarkdown("<:repeat:929131670941089864>")), Button.primary("skip", Emoji.fromMarkdown("<:skip:929131670660067370>"))).queue();
+                hook.editOriginalComponents().setActionRow(
+                        Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")),
+                        Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")),
+                        Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")),
+                        Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")),
+                        Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>"))
+                ).queue();
             } else {
-
                 hook.editOriginal("Something went wrong!").queue();
             }
 //            }

@@ -3,8 +3,9 @@ package de.qStivi.commands;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 
 public class JoinCommand implements ICommand {
+
     private final static Logger LOGGER = LoggerFactory.getLogger(JoinCommand.class);
 
     public static boolean join(Guild guild, Member author) {
@@ -33,12 +35,12 @@ public class JoinCommand implements ICommand {
     @NotNull
     @Override
     public CommandData getCommand() {
-        return new CommandData(getName(), getDescription());
+        return Commands.slash(getName(), getDescription());
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void handle(SlashCommandEvent event) {
+    public void handle(SlashCommandInteractionEvent event) {
         var hook = event.getHook();
 
         LOGGER.info("Trying to join voice channel...");
