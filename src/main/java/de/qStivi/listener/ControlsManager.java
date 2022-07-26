@@ -22,9 +22,9 @@ public class ControlsManager extends ListenerAdapter {
             case "skip" -> pm.skip(guild);
         }
         if (pm.isRepeating(guild)) {
-            event.getHook().editOriginal(event.getMessage().getContentRaw() + "\nCurrent song **__IS__** currently being **__REPEATED__**!").queue();
+            if (!event.getMessage().getContentRaw().toLowerCase().contains("repeat")) event.getHook().editOriginal(event.getMessage().getContentRaw() + "\n\uD83D\uDD01 **__REPEATING__** \uD83D\uDD01").queue();
         } else {
-            var link = event.getMessage().getContentRaw().replaceAll("\nCurrent song \\*\\*__IS__\\*\\* currently being \\*\\*__REPEATED__\\*\\*!", "");
+            var link = event.getMessage().getContentRaw().replaceAll("\n\uD83D\uDD01 \\*\\*__REPEATING__\\*\\* \uD83D\uDD01", "");
             event.getHook().editOriginal(link).queue();
         }
         event.deferEdit().queue();
