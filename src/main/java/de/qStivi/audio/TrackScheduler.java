@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class TrackScheduler extends AudioEventAdapter {
+class TrackScheduler extends AudioEventAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final BlockingQueue<AudioTrack> queue;

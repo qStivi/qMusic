@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +64,7 @@ public class PlayerManager {
 
             @Override
             public void loadFailed(FriendlyException e) {
-                logger.error(Arrays.deepToString(e.getStackTrace()));
+                logger.error(e.getMessage(), e);
             }
         });
     }
