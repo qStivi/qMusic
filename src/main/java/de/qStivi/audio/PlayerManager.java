@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerManager {
+
     private static PlayerManager INSTANCE;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final Map<Long, GuildMusicManager> musicManagers;

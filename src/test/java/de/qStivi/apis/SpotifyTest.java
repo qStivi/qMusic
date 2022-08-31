@@ -10,6 +10,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SpotifyTest {
+
     private Spotify API;
 
     @BeforeEach

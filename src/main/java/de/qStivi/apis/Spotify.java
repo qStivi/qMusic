@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Spotify {
+
     private static final String CLIENT_ID = Config.get("SPOTIFY_ID");
     private static final String CLIENT_SECRET = Config.get("SPOTIFY_SECRET");
     private static final SpotifyApi API = new SpotifyApi.Builder().setClientId(CLIENT_ID).setClientSecret(CLIENT_SECRET).build();
