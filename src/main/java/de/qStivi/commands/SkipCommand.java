@@ -21,6 +21,7 @@ public class SkipCommand implements ICommand {
     @Override
     public void handle(SlashCommandInteractionEvent event) {
         PlayerManager.getINSTANCE().skip(event.getGuild());
+        PlayerManager.getINSTANCE().setRepeat(event.getGuild(), false);
         event.getHook().editOriginal("Skipping....").delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
     }
 
