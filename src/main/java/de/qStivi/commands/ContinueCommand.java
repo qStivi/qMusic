@@ -20,7 +20,7 @@ public class ContinueCommand implements ICommand {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        PlayerManager.getINSTANCE().unpause(event.getGuild()); //TODO add check if continue has worked if possible
+        PlayerManager.unpause(event.getGuild()); //TODO add check if continue has worked if possible
         event.getHook().editOriginal("Continuing...").delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
     }
 

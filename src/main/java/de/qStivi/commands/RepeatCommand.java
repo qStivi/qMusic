@@ -22,9 +22,8 @@ public class RepeatCommand implements ICommand {
     public void handle(SlashCommandInteractionEvent event) {
         var hook = event.getHook();
 
-        PlayerManager playerManager = PlayerManager.getINSTANCE();
-        playerManager.setRepeat(event.getGuild(), !playerManager.isRepeating(event.getGuild()));
-        if (playerManager.isRepeating(event.getGuild())) {
+        PlayerManager.setRepeat(event.getGuild(), !PlayerManager.isRepeating(event.getGuild()));
+        if (PlayerManager.isRepeating(event.getGuild())) {
             hook.editOriginal("Repeat: ON").delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
         } else {
             hook.editOriginal("Repeat: OFF").delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();

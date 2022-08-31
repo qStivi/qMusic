@@ -19,35 +19,23 @@ import java.util.Map;
 
 public class PlayerManager {
 
-    private static PlayerManager INSTANCE;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final Map<Long, GuildMusicManager> musicManagers;
-    private final AudioPlayerManager audioPlayerManager;
+    private static final Logger logger = LoggerFactory.getLogger(PlayerManager.class);
+    private static final Map<Long, GuildMusicManager> musicManagers = new HashMap<>();
+    private static final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
 
-    private PlayerManager() {
-        this.musicManagers = new HashMap<>();
-        this.audioPlayerManager = new DefaultAudioPlayerManager();
-        this.audioPlayerManager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
-        this.audioPlayerManager.getConfiguration().setOpusEncodingQuality(AudioConfiguration.OPUS_QUALITY_MAX);
+    static {
+        audioPlayerManager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
+        audioPlayerManager.getConfiguration().setOpusEncodingQuality(AudioConfiguration.OPUS_QUALITY_MAX);
 
-        AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
-        AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
+        AudioSourceManagers.registerRemoteSources(audioPlayerManager);
+        AudioSourceManagers.registerLocalSource(audioPlayerManager);
 
-        logger.info("new PlayerManager()");
+        logger.info("Player manager loaded.");
     }
 
-    public static PlayerManager getINSTANCE() {
-
-        if (INSTANCE == null) {
-            INSTANCE = new PlayerManager();
-        }
-
-        return INSTANCE;
-    }
-
-    private GuildMusicManager getMusicManager(Guild guild) {
-        return this.musicManagers.computeIfAbsent(guild.getIdLong(), (guildId) -> {
-            var guildMusicManager = new GuildMusicManager(this.audioPlayerManager);
+    private static GuildMusicManager getMusicManager(Guild guild) {
+        return musicManagers.computeIfAbsent(guild.getIdLong(), (guildId) -> {
+            var guildMusicManager = new GuildMusicManager(audioPlayerManager);
 
             guild.getAudioManager().setSendingHandler(guildMusicManager.getAudioSendHandler());
 
@@ -56,10 +44,10 @@ public class PlayerManager {
     }
 
     // TODO test this with playlists
-    public void loadAndPlay(Guild guild, String trackURL) {
-        var musicManager = this.getMusicManager(guild);
+    public static void loadAndPlay(Guild guild, String trackURL) {
+        var musicManager = getMusicManager(guild);
 
-        this.audioPlayerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {
+        audioPlayerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 musicManager.trackScheduler.queue(track);
@@ -90,8 +78,8 @@ public class PlayerManager {
      * @param guild is the guild where the music should be skipped.
      * @see TrackScheduler
      */
-    public void skip(Guild guild) {
-        this.getMusicManager(guild).trackScheduler.skip();
+    public static void skip(Guild guild) {
+        getMusicManager(guild).trackScheduler.skip();
     }
 
     /**
@@ -100,8 +88,8 @@ public class PlayerManager {
      * @param guild is the guild where the music should be paused.
      * @see TrackScheduler
      */
-    public void pause(Guild guild) {
-        this.getMusicManager(guild).trackScheduler.pause();
+    public static void pause(Guild guild) {
+        getMusicManager(guild).trackScheduler.pause();
     }
 
     /**
@@ -110,8 +98,8 @@ public class PlayerManager {
      * @param guild is the guild where the music should be continued.
      * @see TrackScheduler
      */
-    public void unpause(Guild guild) {
-        this.getMusicManager(guild).trackScheduler.unpause();
+    public static void unpause(Guild guild) {
+        getMusicManager(guild).trackScheduler.unpause();
     }
 
     /**
@@ -121,8 +109,8 @@ public class PlayerManager {
      * @param repeat is the new value.
      * @see TrackScheduler
      */
-    public void setRepeat(Guild guild, boolean repeat) {
-        this.getMusicManager(guild).trackScheduler.setRepeating(repeat);
+    public static void setRepeat(Guild guild, boolean repeat) {
+        getMusicManager(guild).trackScheduler.setRepeating(repeat);
     }
 
     /**
@@ -132,8 +120,8 @@ public class PlayerManager {
      * @return Boolean of the current repeating state.
      * @see TrackScheduler
      */
-    public boolean isRepeating(Guild guild) {
-        return this.getMusicManager(guild).trackScheduler.isRepeating();
+    public static boolean isRepeating(Guild guild) {
+        return getMusicManager(guild).trackScheduler.isRepeating();
     }
 
     /**
@@ -142,8 +130,8 @@ public class PlayerManager {
      * @param guild is the guild where the music is playing.
      * @see TrackScheduler
      */
-    public void stop(Guild guild) {
-        this.getMusicManager(guild).trackScheduler.stop();
+    public static void stop(Guild guild) {
+        getMusicManager(guild).trackScheduler.stop();
     }
 
     /**
@@ -153,7 +141,7 @@ public class PlayerManager {
      * @see TrackScheduler
      */
     @Nullable
-    public AudioTrack getCurrentTrack(Guild guild) {
-        return this.getMusicManager(guild).trackScheduler.getCurrentTrack();
+    public static AudioTrack getCurrentTrack(Guild guild) {
+        return getMusicManager(guild).trackScheduler.getCurrentTrack();
     }
 }

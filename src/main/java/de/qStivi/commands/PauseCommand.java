@@ -20,7 +20,7 @@ public class PauseCommand implements ICommand {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        PlayerManager.getINSTANCE().pause(event.getGuild());
+        PlayerManager.pause(event.getGuild());
         event.getHook().editOriginal("Playback paused.").delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
     }
 

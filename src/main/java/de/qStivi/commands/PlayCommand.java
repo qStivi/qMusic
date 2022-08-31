@@ -91,14 +91,14 @@ public class PlayCommand implements ICommand {
         List<String> ids = YouTube.getPlaylistItemsByLink(link);
         if (randomizeOrder) Collections.shuffle(ids);
         for (String id : ids) {
-            PlayerManager.getINSTANCE().loadAndPlay(channel.getGuild(), "https://youtu.be/" + id);
+            PlayerManager.loadAndPlay(channel.getGuild(), "https://youtu.be/" + id);
         }
         channel.sendMessage("Added " + ids.size() + " songs to the queue.").queue();
         return link;
     }
 
     private String playYoutubeTrack(String url, Guild guild) {
-        PlayerManager.getINSTANCE().loadAndPlay(guild, url);
+        PlayerManager.loadAndPlay(guild, url);
         return url;
     }
 
@@ -130,7 +130,7 @@ public class PlayCommand implements ICommand {
         search = Util.cleanForURL(search);
         String id = YouTube.getVideoIdBySearchQuery(search);
         String link = "https://youtu.be/" + id;
-        PlayerManager.getINSTANCE().loadAndPlay(channel.getGuild(), link);
+        PlayerManager.loadAndPlay(channel.getGuild(), link);
         return link;
     }
 
@@ -155,7 +155,7 @@ public class PlayCommand implements ICommand {
 //            } else {
             var msg = playSong(event.getOptions().get(0), true, event.getChannel().asTextChannel(), event.getGuild(), event);
             if (msg != null) {
-                if (PlayerManager.getINSTANCE().isRepeating(event.getGuild())) {
+                if (PlayerManager.isRepeating(event.getGuild())) {
                     hook.editOriginal(msg + "\nCurrent song **__IS__** currently being **__REPEATED__**!").queue();
                 } else {
                     hook.editOriginal(msg).queue();

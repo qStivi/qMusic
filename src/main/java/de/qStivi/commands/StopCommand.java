@@ -20,7 +20,7 @@ public class StopCommand implements ICommand {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        PlayerManager.getINSTANCE().stop(event.getGuild());
+        PlayerManager.stop(event.getGuild());
         event.getHook().editOriginal("Playback stopped.").delay(Duration.ofSeconds(10)).flatMap(Message::delete).queue();
     }
 
