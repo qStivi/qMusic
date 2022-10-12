@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class Bot extends ListenerAdapter {
     private static final Logger logger = getLogger(Bot.class);
     public static ShardManager SHARD_MANAGER;
 
-    public static void main(String[] args) throws LoginException {
+    public static void main(String[] args) {
         SHARD_MANAGER = DefaultShardManagerBuilder.createLight(Config.get("TOKEN")).addEventListeners(new ControlsManager(), new CommandHandler(), new Bot()).setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.VOICE).setActivity(Activity.playing("/help")).build();
 
         List<CommandData> commandDataList = new ArrayList<>();

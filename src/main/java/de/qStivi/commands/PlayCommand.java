@@ -2,10 +2,9 @@ package de.qStivi.commands;
 
 import de.qStivi.Util;
 import de.qStivi.apis.Spotify;
-import de.qStivi.apis.YouTube;
 import de.qStivi.audio.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,8 +16,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.util.Arrays;
 
 import static de.qStivi.commands.JoinCommand.join;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -28,7 +27,7 @@ public class PlayCommand implements ICommand {
     private static final Logger logger = getLogger(PlayCommand.class);
 
 
-    public String playSong(OptionMapping optionMapping, boolean shuffle, TextChannel channel, Guild guild, SlashCommandInteractionEvent event) {
+    public String playSong(OptionMapping optionMapping, boolean shuffle, TextChannel channel, Guild guild) throws IOException {
 
         var song = optionMapping.getAsString().trim();
 
@@ -57,7 +56,7 @@ public class PlayCommand implements ICommand {
         return song;
     }
 
-    private String playSpotifyTrack(String link, TextChannel channel) {
+    private String playSpotifyTrack(String link, TextChannel channel) throws IOException {
 
         if (link.contains("open.spotify.com/track/")) {
             link = link.replace("https://", "");
@@ -68,7 +67,7 @@ public class PlayCommand implements ICommand {
         }
 
         Spotify spotify = new Spotify();
-        String search = spotify.getTrackArtists(link) + " " + spotify.getTrackName(link);
+        String search = Arrays.toString(spotify.getTrackArtists(link)) + " " + spotify.getTrackName(link);
         search = searchPlay(search, channel);
         return search;
     }
@@ -86,15 +85,15 @@ public class PlayCommand implements ICommand {
         return null;
     }
 
-    private String playYoutubePlaylist(String link, Boolean randomizeOrder, TextChannel channel) {
+    private String playYoutubePlaylist(String link, Boolean randomizeOrder, TextChannel channel) throws IOException {
 
-        List<String> ids = YouTube.getPlaylistItemsByLink(link);
-        if (randomizeOrder) Collections.shuffle(ids);
-        for (String id : ids) {
-            PlayerManager.loadAndPlay(channel.getGuild(), "https://youtu.be/" + id);
-        }
-        channel.sendMessage("Added " + ids.size() + " songs to the queue.").queue();
-        return link;
+//        var ids = YouTube.getPlaylistItemsByLink(link);
+//        if (randomizeOrder) Collections.shuffle(ids);
+//        for (String id : ids) {
+//            PlayerManager.loadAndPlay(channel.getGuild(), "https://youtu.be/" + id);
+//        }
+//        channel.sendMessage("Added " + ids.size() + " songs to the queue.").queue();
+        return null;
     }
 
     private String playYoutubeTrack(String url, Guild guild) {
@@ -126,12 +125,12 @@ public class PlayCommand implements ICommand {
         return null;
     }
 
-    private String searchPlay(String search, TextChannel channel) {
-        search = Util.cleanForURL(search);
-        String id = YouTube.getVideoIdBySearchQuery(search);
-        String link = "https://youtu.be/" + id;
-        PlayerManager.loadAndPlay(channel.getGuild(), link);
-        return link;
+    private String searchPlay(String search, TextChannel channel) throws IOException {
+//        search = Util.cleanForYoutubeSearch(search);
+//        String id = YouTube.getVideoIdBySearchQuery(search);
+//        String link = "https://youtu.be/" + id;
+//        PlayerManager.loadAndPlay(channel.getGuild(), link);
+        return null;
     }
 
     @NotNull
@@ -153,7 +152,7 @@ public class PlayCommand implements ICommand {
 //                    hook.sendMessage(playSong(event.getOption("query").getAsString(), true, event.getTextChannel(), event.getGuild())).queue();
 //                }
 //            } else {
-            var msg = playSong(event.getOptions().get(0), true, event.getChannel().asTextChannel(), event.getGuild(), event);
+            var msg = playSong(event.getOptions().get(0), true, event.getChannel().asTextChannel(), event.getGuild());
             if (msg != null) {
                 if (PlayerManager.isRepeating(event.getGuild())) {
                     hook.editOriginal(msg + "\nCurrent song **__IS__** currently being **__REPEATED__**!").queue();
