@@ -36,7 +36,9 @@ public class SpotifyAPI {
     public static Track getTrack(@NotNull String id) throws NoResultsException {
         if (id.isEmpty()) throw new IllegalArgumentException("String cannot be empty!");
         try {
-            return API.getTrack(id).build().execute();
+            var track = API.getTrack(id).build().execute();
+            LOGGER.info("Successfully retrieved Spotify track:" + track.getName() + " (" + track.getId() + ")");
+            return track;
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new NoResultsException(e.getMessage());
         }
@@ -46,7 +48,9 @@ public class SpotifyAPI {
     public static Playlist getPlaylist(@NotNull String id) throws NoResultsException {
         if (id.isEmpty()) throw new IllegalArgumentException("String cannot be empty!");
         try {
-            return API.getPlaylist(id).build().execute();
+            var playlist = API.getPlaylist(id).build().execute();
+            LOGGER.info("Successfully retrieved Spotify playlist: " + playlist.getName() + " (" + playlist.getId() + ")");
+            return playlist;
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new NoResultsException(e.getMessage());
         }

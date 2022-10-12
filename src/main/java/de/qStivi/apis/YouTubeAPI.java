@@ -12,6 +12,8 @@ import com.google.api.services.youtube.model.Video;
 import de.qStivi.Config;
 import de.qStivi.NoResultsException;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -19,10 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-// TODO add logging
 public class YouTubeAPI {
 
     private static final YouTube API;
+    private static final Logger LOGGER = LoggerFactory.getLogger(YouTubeAPI.class);
 
     // region Static Initializer
     // Using null for the httpRequestInitializer in the YouTube.Builder()
@@ -70,6 +72,8 @@ public class YouTubeAPI {
         if (items.isEmpty()) {
             throw new NoResultsException(searchQuery);
         }
+        LOGGER.info("Successfully retrieved " + items.size() + " search results from YouTube");
+        items.forEach(searchResult -> LOGGER.info(searchResult.getSnippet().getTitle() + " (" + searchResult.getId() + ")"));
         return items;
     }
 
@@ -95,6 +99,8 @@ public class YouTubeAPI {
         if (items.isEmpty()) {
             throw new NoResultsException(searchQuery);
         }
+        LOGGER.info("Successfully retrieved " + items.size() + " search results from YouTube");
+        items.forEach(searchResult -> LOGGER.info(searchResult.getSnippet().getTitle() + " (" + searchResult.getId() + ")"));
         return items;
     }
 
@@ -119,6 +125,8 @@ public class YouTubeAPI {
             throw new NoResultsException(e.getDetails().getErrors().get(0).getReason());
         }
         if (items.isEmpty()) throw new NoResultsException("Playlist is empty!");
+        LOGGER.info("Successfully retrieved " + items.size() + " playlist items from YouTube" + " (" + playlistId + ")");
+        items.forEach(playlistItem -> LOGGER.info(playlistItem.getSnippet().getTitle() + " (" + playlistItem.getId() + ")"));
         return items;
     }
 
@@ -144,6 +152,8 @@ public class YouTubeAPI {
         if (items.isEmpty()) {
             throw new NoResultsException("How did this happen?!");
         }
+        LOGGER.info("Successfully retrieved information about " + items.size() + " video(s)");
+        items.forEach(video -> LOGGER.info(video.getSnippet().getTitle() + " (" + video.getId() + ")"));
         return items;
     }
 }
