@@ -1,7 +1,7 @@
 package de.qStivi.commands;
 
 import de.qStivi.Util;
-import de.qStivi.apis.Spotify;
+import de.qStivi.apis.SpotifyAPI;
 import de.qStivi.audio.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import static de.qStivi.commands.JoinCommand.join;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -66,10 +65,10 @@ public class PlayCommand implements ICommand {
             link = link.split(":")[2];
         }
 
-        Spotify spotify = new Spotify();
-        String search = Arrays.toString(spotify.getTrackArtists(link)) + " " + spotify.getTrackName(link);
-        search = searchPlay(search, channel);
-        return search;
+        SpotifyAPI spotifyAPI = new SpotifyAPI();
+//        String search = Arrays.toString(spotifyAPI.getTrackArtists(link)) + " " + spotifyAPI.getTrackName(link);
+//        search = searchPlay(search, channel);
+        return null;
     }
 
     private SpotifyType getSpotifyType(String link) {

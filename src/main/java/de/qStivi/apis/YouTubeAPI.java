@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+// TODO add logging
 public class YouTubeAPI {
 
     private static final YouTube API;
