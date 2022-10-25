@@ -6,152 +6,131 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import org.jetbrains.annotations.Nullable;
+import net.dv8tion.jda.api.entities.Guild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.Arrays;
+import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-class TrackScheduler extends AudioEventAdapter {
+// TODO Logging
+public class TrackScheduler extends AudioEventAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final BlockingQueue<AudioTrack> queue;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AudioEventAdapter.class);
     private final AudioPlayer player;
-    private boolean isRepeating;
+    private final Guild guild;
+    private final Queue<AudioTrack> queue = new LinkedBlockingQueue<>();
+    private boolean isRepeating = false;
 
-    TrackScheduler(AudioPlayer player) {
+    public TrackScheduler(AudioPlayer player, Guild guild) {
+        super();
         this.player = player;
-        this.queue = new LinkedBlockingQueue<>();
-        logger.info("new TrackScheduler()");
+        this.guild = guild;
+        LOGGER.info("TrackScheduler() - New TrackScheduler initialized");
     }
 
-    //region overrides
-    //TODO try to use all these overrides they seem useful...
     @Override
     public void onPlayerPause(AudioPlayer player) {
         super.onPlayerPause(player);
+        LOGGER.info("onPlayerPause()");
     }
 
     @Override
     public void onPlayerResume(AudioPlayer player) {
         super.onPlayerResume(player);
+        LOGGER.info("onPlayerResume()");
     }
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         super.onTrackStart(player, track);
+        LOGGER.info("onTrackStart() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ")");
+    }
+
+    @Override
+    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        super.onTrackEnd(player, track, endReason);
+        LOGGER.info("onTrackEnd() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ") - End Reason: " + endReason.toString());
+
+        if (endReason.mayStartNext) {
+            if (isRepeating) {
+                player.playTrack(track.makeClone());
+            } else {
+                player.playTrack(queue.poll());
+            }
+        }
+
+        // endReason == FINISHED: A track finished or died by an exception (mayStartNext = true).
+        // endReason == LOAD_FAILED: Loading of a track failed (mayStartNext = true).
+        // endReason == STOPPED: The player was stopped.
+        // endReason == REPLACED: Another track started playing while this had not finished
+        // endReason == CLEANUP: Player hasn't been queried for a while, if you want you can put a
+        //                       clone of this back to your queue
     }
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         super.onTrackException(player, track, exception);
+        LOGGER.info("onTrackException() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ") - FriendlyException: " + exception.getMessage());
+        // An already playing track threw an exception (track end event will still be received separately)
     }
 
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         super.onTrackStuck(player, track, thresholdMs);
+        LOGGER.info("onTrackStuck() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ") - thresholdMs: " + thresholdMs);
+        // Audio track has been unable to provide us any audio, might want to just start a new track
     }
 
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs, StackTraceElement[] stackTrace) {
         super.onTrackStuck(player, track, thresholdMs, stackTrace);
+        LOGGER.info("onTrackStuck() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ") - thresholdMs: " + thresholdMs + " stackTrace: " + Arrays.deepToString(stackTrace));
+        // Audio track has been unable to provide us any audio, might want to just start a new track
     }
 
     @Override
     public void onEvent(AudioEvent event) {
         super.onEvent(event);
+        LOGGER.info("onEvent() - Guild: " + guild.getId());
     }
 
-    /**
-     * Handles what happens after a track has stopped playing.
-     *
-     * @param player    Discord's {@link AudioPlayer}
-     * @param track     {@link AudioTrack} which has stopped playing.
-     * @param endReason The reason why the {@link AudioTrack} has stopped playing.
-     */
-    @Override
-    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (endReason.mayStartNext) {
-            if (isRepeating) {
-                logger.info("Repeat track...");
-                this.player.startTrack(track.makeClone(), false);
+    void queue(AudioTrack track) {
+        var trackInfo = track.getInfo().title + " (" + track.getIdentifier() + ")";
+        if (player.getPlayingTrack() != null) {
+            LOGGER.info("queue() - Queueing track: " + trackInfo);
+            if (queue.offer(track)) {
+                LOGGER.info("queue() - Successfully queued track: " + trackInfo);
             } else {
-                logger.info("Next track...");
-                this.player.startTrack(this.queue.poll(), false);
+                LOGGER.error("queue() - Error while queueing track: " + trackInfo);
             }
+        } else {
+            LOGGER.info("queue() - Playing track: " + trackInfo);
+            player.playTrack(track);
         }
-    }
-    //endregion
-
-    //region getter and setter
-    public BlockingQueue<AudioTrack> getQueue() {
-        return queue;
+        queue.forEach(audioTrack -> LOGGER.info(audioTrack.getIdentifier()));
     }
 
-    public boolean isRepeating() {
+    Queue<AudioTrack> getQueue() {
+        return new LinkedBlockingQueue<>(queue);
+    }
+
+    boolean toggleRepeat() {
+        isRepeating = !isRepeating;
         return isRepeating;
     }
 
-    public void setRepeating(boolean repeating) {
-        isRepeating = repeating;
-    }
-    //endregion
-
-    /**
-     * Starts playing an {@link AudioTrack} or adds it to the queue if it couldn't be played without interrupting another.
-     *
-     * @param track {@link AudioTrack} to be queued
-     * @return true if track was queued
-     */
-    void queue(AudioTrack track) {
-        var queued = false;
-        if (!this.player.startTrack(track, true)) {
-            queued = this.queue.offer(track);
-            if (queued) logger.info(track.getInfo().title + " has been queued.");
-        }
-        logger.info("Skipped queueing " + track.getInfo().title);
-    }
-
-    /**
-     * Returns the currently playing track or null if no track is playing.
-     *
-     * @return {@link AudioTrack} or null
-     */
-    @Nullable AudioTrack getCurrentTrack() {
-        return player.getPlayingTrack();
-    }
-
-    /**
-     * Pauses currently playing {@link AudioTrack}.
-     */
-    void pause() {
-        player.setPaused(true);
-        logger.info("paused...");
-    }
-
-    /**
-     * Skips currently playing {@link AudioTrack}.
-     */
     void skip() {
-        player.startTrack(queue.poll(), false);
-        logger.info("skipping...");
+        player.playTrack(queue.poll());
     }
 
-    /**
-     * Unpauses currently playing {@link AudioTrack}.
-     */
-    void unpause() {
-        player.setPaused(false);
-        logger.info("unpaused...");
-    }
-
-    /**
-     * Stops currently playing {@link AudioTrack} and clears queue.
-     */
     void stop() {
         queue.clear();
         skip();
-        logger.info("stopping...");
+    }
+
+    boolean isRepeating() {
+        return isRepeating;
     }
 }

@@ -1,20 +1,25 @@
 package de.qStivi.commands;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import de.qStivi.NoResultsException;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.io.IOException;
 
-public interface ICommand {
+public interface ICommand<T extends GenericCommandInteractionEvent> {
 
-    @Nonnull
+    @NotNull
     CommandData getCommand();
 
-    void handle(SlashCommandInteractionEvent event);
+    void handle(T event) throws NoResultsException, IOException;
 
-    @Nonnull
+    @NotNull
     String getName();
 
-    @Nonnull
-    String getDescription();
+    @NotNull
+    default String getDescription() {
+        //noinspection ConstantConditions
+        return null;
+    }
 }

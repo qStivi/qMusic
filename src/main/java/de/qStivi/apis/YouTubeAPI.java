@@ -9,8 +9,8 @@ import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
-import de.qStivi.Config;
 import de.qStivi.NoResultsException;
+import de.qStivi.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +31,7 @@ public class YouTubeAPI {
     // and setting the GoogleClientRequestInitializer to a YouTubeRequestInitializer with an API key
     // allows to use the API for global data without needing to authenticate a user via OAuth2 everytime
     static {
+        LOGGER.info("Initializing YouTube API...");
         NetHttpTransport tt;
         try {
             tt = GoogleNetHttpTransport.newTrustedTransport();
@@ -39,9 +40,10 @@ public class YouTubeAPI {
         }
 
         YouTube.Builder builder = new YouTube.Builder(tt, GsonFactory.getDefaultInstance(), null);
-        builder.setGoogleClientRequestInitializer(new YouTubeRequestInitializer(Config.get("YOUTUBE_KEY")));
+        builder.setGoogleClientRequestInitializer(new YouTubeRequestInitializer(Properties.YOUTUBE_API_KEY));
         builder.setApplicationName("qMusic");
         API = builder.build();
+        LOGGER.info("YouTube API successfully initialized!");
     }
     // endregion Static Initializer
 
@@ -72,7 +74,7 @@ public class YouTubeAPI {
         if (items.isEmpty()) {
             throw new NoResultsException(searchQuery);
         }
-        LOGGER.info("Successfully retrieved " + items.size() + " search results from YouTube");
+        LOGGER.info("Successfully retrieved " + items.size() + " search results from YouTube.");
         items.forEach(searchResult -> LOGGER.info(searchResult.getSnippet().getTitle() + " (" + searchResult.getId() + ")"));
         return items;
     }
@@ -99,7 +101,7 @@ public class YouTubeAPI {
         if (items.isEmpty()) {
             throw new NoResultsException(searchQuery);
         }
-        LOGGER.info("Successfully retrieved " + items.size() + " search results from YouTube");
+        LOGGER.info("Successfully retrieved " + items.size() + " search results from YouTube.");
         items.forEach(searchResult -> LOGGER.info(searchResult.getSnippet().getTitle() + " (" + searchResult.getId() + ")"));
         return items;
     }
@@ -125,7 +127,7 @@ public class YouTubeAPI {
             throw new NoResultsException(e.getDetails().getErrors().get(0).getReason());
         }
         if (items.isEmpty()) throw new NoResultsException("Playlist is empty!");
-        LOGGER.info("Successfully retrieved " + items.size() + " playlist items from YouTube" + " (" + playlistId + ")");
+        LOGGER.info("Successfully retrieved " + items.size() + " playlist items from YouTube" + " (" + playlistId + ").");
         items.forEach(playlistItem -> LOGGER.info(playlistItem.getSnippet().getTitle() + " (" + playlistItem.getId() + ")"));
         return items;
     }
@@ -152,7 +154,7 @@ public class YouTubeAPI {
         if (items.isEmpty()) {
             throw new NoResultsException("How did this happen?!");
         }
-        LOGGER.info("Successfully retrieved information about " + items.size() + " video(s)");
+        LOGGER.info("Successfully retrieved information about " + items.size() + " video(s)!");
         items.forEach(video -> LOGGER.info(video.getSnippet().getTitle() + " (" + video.getId() + ")"));
         return items;
     }
