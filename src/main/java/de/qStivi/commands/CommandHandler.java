@@ -23,6 +23,7 @@ public class CommandHandler extends ListenerAdapter {
     static {
         LOGGER.info("Registering commands.");
         SLASH_COMMAND_LIST.add(new PlaySlashCommand());
+        SLASH_COMMAND_LIST.add(new PlaySpotifySlashCommand());
         USER_CONTEXT_INTERACTION_COMMAND_LIST.add(new ShutdownUserContextCommand());
     }
 
@@ -30,11 +31,13 @@ public class CommandHandler extends ListenerAdapter {
     public void onGenericCommandInteraction(@NotNull GenericCommandInteractionEvent event) {
         for (var command : SLASH_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-                try {
-                    command.handle((SlashCommandInteractionEvent) event);
-                } catch (NoResultsException | IOException e) {
-                    event.reply(e.getMessage()).queue();
-                }
+                new Thread(() -> {
+                    try {
+                        command.handle((SlashCommandInteractionEvent) event);
+                    } catch (NoResultsException | IOException e) {
+                        event.reply(e.getMessage()).queue();
+                    }
+                }).start();
             }
         }
 

@@ -55,7 +55,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
         if (endReason.mayStartNext) {
             if (isRepeating) {
-                player.playTrack(track.makeClone());
+//                player.playTrack(track.makeClone());
+                player.playTrack(queue.poll());
             } else {
                 player.playTrack(queue.poll());
             }
