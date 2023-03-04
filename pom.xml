@@ -28,7 +28,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-alpha.21</version>
+            <version>5.0.0-beta.5</version>
         </dependency>
 
         <!-- lavaplayer -->
@@ -52,26 +52,29 @@
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
             <artifactId>spotify-web-api-java</artifactId>
-            <version>7.2.1</version>
+            <version>8.0.0</version>
         </dependency>
 
         <!-- Google -->
         <!-- https://developers.google.com/explorer-help/code-samples#java -->
+        <!-- https://googleapis.dev/java/google-api-services-youtube/latest/index.html -->
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-youtube</artifactId>
-            <version>v3-rev20220926-2.0.0</version>
+            <version>v3-rev20230123-2.0.0</version>
         </dependency>
 
         <!-- Testing -->
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.0</version>
+            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
 
         <!-- Logging -->
+        <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
