@@ -37,25 +37,30 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
     public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
         var option = event.getOption(COMMAND_NAME);
         if (option == null) {
-            event.getHook().editOriginal("Something ent wrong!").queue();
+            event.reply("Something ent wrong!").queue();
             return;
         }
         var guild = event.getGuild();
         if (guild == null) {
-            event.getHook().editOriginal("Something ent wrong!").queue();
+            event.reply("Something ent wrong!").queue();
             return;
         }
         var member = event.getMember();
         if (member == null) {
-            event.getHook().editOriginal("Something ent wrong!").queue();
+            event.reply("Something ent wrong!").queue();
             return;
         }
         var voiceState = member.getVoiceState();
         if (voiceState == null) {
-            event.getHook().editOriginal("Something ent wrong!").queue();
+            event.reply("Something ent wrong!").queue();
             return;
         }
-        guild.getAudioManager().openAudioConnection(voiceState.getChannel());
+        var channel = voiceState.getChannel();
+        if (channel == null) {
+            event.reply("Something ent wrong!").queue();
+            return;
+        }
+        guild.getAudioManager().openAudioConnection(channel);
 
         // https://open.spotify.com/playlist/6eLECLM3JbU5JSZfj5p59i?si=082dc01c7c5542d9
         var sID = option.getAsString().substring(34).split("\\?")[0];
