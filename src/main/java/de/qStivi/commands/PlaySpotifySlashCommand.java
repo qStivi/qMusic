@@ -36,31 +36,12 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
     @Override
     public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
         var option = event.getOption(COMMAND_NAME);
-        if (option == null) {
-            event.reply("Something ent wrong!").queue();
-            return;
-        }
         var guild = event.getGuild();
-        if (guild == null) {
-            event.reply("Something ent wrong!").queue();
+        if (option == null) {
+            event.getHook().editOriginal("Something ent wrong!").queue();
             return;
         }
-        var member = event.getMember();
-        if (member == null) {
-            event.reply("Something ent wrong!").queue();
-            return;
-        }
-        var voiceState = member.getVoiceState();
-        if (voiceState == null) {
-            event.reply("Something ent wrong!").queue();
-            return;
-        }
-        var channel = voiceState.getChannel();
-        if (channel == null) {
-            event.reply("Something ent wrong!").queue();
-            return;
-        }
-        guild.getAudioManager().openAudioConnection(channel);
+        LavaPlayer.openAudioConnection(event);
 
         // https://open.spotify.com/playlist/6eLECLM3JbU5JSZfj5p59i?si=082dc01c7c5542d9
         var sID = option.getAsString().substring(34).split("\\?")[0];
@@ -74,7 +55,7 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
             var artists = Arrays.stream(otherTrack.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(" - "));
 
             var id = YouTubeAPI.getSearchResults(name + " - " + artists).get(0).getId().getVideoId();
-            LavaPlayer.playOrdered(id, guild);
+            LavaPlayer.play(id, guild, random);
         }
         while (LavaPlayer.trackIsLoading(guild)) {
             // TODO Is there a better way to do this?
@@ -85,8 +66,8 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
             }
         }
         var track = LavaPlayer.getPlayingTrack(guild);
-        event.reply("Playing: " + track.getInfo().author + " - " + track.getInfo().title + " (" + track.getIdentifier() + ")\n" + "https://youtu.be/" + track.getIdentifier()).addComponents(ActionRow.of(Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")), Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>")), Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")))).queue();
-
+        event.getHook().editOriginal("Playing: " + track.getInfo().author + " - " + track.getInfo().title + " (" + track.getIdentifier() + ")\n" + "https://youtu.be/" + track.getIdentifier()).queue();
+        event.getHook().editOriginalComponents(ActionRow.of(Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")), Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>")), Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")))).queue();
     }
 
     @NotNull

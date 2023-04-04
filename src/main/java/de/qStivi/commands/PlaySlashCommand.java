@@ -3,68 +3,60 @@ package de.qStivi.commands;
 import de.qStivi.NoResultsException;
 import de.qStivi.apis.YouTubeAPI;
 import de.qStivi.audio.LavaPlayer;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlaySlashCommand.class);
 
-    private static final String COMMAND_NAME = "link_or_search";
+    private static final String QUERY = "query";
+    private static final String RANDOM = "random";
 
     @NotNull
     @Override
     public CommandData getCommand() {
-        return Commands.slash(getName(), getDescription()).addOption(OptionType.STRING, COMMAND_NAME, getDescription(), true);
+        return Commands.slash(getName(), getDescription())
+                .addOption(OptionType.STRING, QUERY, "The thing you want to play (search or link)", true)
+                .addOption(OptionType.BOOLEAN, RANDOM, "Whether you want to randomize the order of playback (default true)", false);
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
-        var option = event.getOption(COMMAND_NAME);
-        if (option == null) {
-            event.reply("Something ent wrong!").queue();
-            return;
-        }
+    public void handle(SlashCommandInteractionEvent event) {
+        var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
+        var randomOption = event.getOption(QUERY);
         var guild = event.getGuild();
-        if (guild == null) {
-            event.reply("Something ent wrong!").queue();
-            return;
-        }
-        var member = event.getMember();
-        if (member == null) {
-            event.reply("Something ent wrong!").queue();
-            return;
-        }
-        var voiceState = member.getVoiceState();
-        if (voiceState == null) {
-            event.reply("Something ent wrong!").queue();
-            return;
-        }
-        guild.getAudioManager().openAudioConnection(voiceState.getChannel());
 
-        LavaPlayer.playOrdered(option.getAsString(), guild);
+        var random = false;
+
+        if (randomOption != null) {
+            random = randomOption.getAsBoolean();
+        }
+
+        LavaPlayer.openAudioConnection(event);
+
+        LavaPlayer.play(query, guild, random);
+
         while (LavaPlayer.trackIsLoading(guild)) {
-            // TODO Is there a better way to do this?
+            Thread.onSpinWait();
         }
         if (LavaPlayer.loadFailed(guild)) {
-            var id = YouTubeAPI.getSearchResults(option.getAsString()).get(0).getId().getVideoId();
-            LavaPlayer.playOrdered(id, guild);
-            while (LavaPlayer.trackIsLoading(guild)) {
-                // TODO Is there a better way to do this?
-            }
+            LOGGER.info("Load Failed!");
+            event.getHook().editOriginal("Load Failed!").queue();
+//            var id = YouTubeAPI.getSearchResults(query).get(0).getId().getVideoId();
+//            LavaPlayer.play(id, guild);
+//            while (LavaPlayer.trackIsLoading(guild)) {
+//                Thread.onSpinWait();
+//            }
         }
-        var track = LavaPlayer.getPlayingTrack(guild);
-        event.reply("Playing: " + track.getInfo().author + " - " + track.getInfo().title + " (" + track.getIdentifier() + ")\n" + "https://youtu.be/" + track.getIdentifier()).addComponents(ActionRow.of(Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")), Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>")), Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")))).queue();
     }
 
     @NotNull

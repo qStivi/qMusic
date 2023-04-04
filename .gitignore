@@ -123,3 +123,7 @@ buildNumber.properties
 .env
 client_secret.json
 *.properties
+
+# Python
+venv/
+TTS/

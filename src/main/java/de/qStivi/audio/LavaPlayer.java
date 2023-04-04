@@ -6,6 +6,12 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import de.qStivi.Main;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +27,10 @@ public class LavaPlayer {
     private static final DefaultAudioPlayerManager PLAYER_MANAGER = new DefaultAudioPlayerManager();
     private static final Map<Guild, AudioLoadHandler> AUDIO_LOAD_HANDLER_MAP = new HashMap<>();
 
+    private static InteractionHook INTERACTION_HOOK = null;
+
     static {
         AudioSourceManagers.registerRemoteSources(PLAYER_MANAGER);
-
 //        var config = PLAYER_MANAGER.getConfiguration();
 //        config.setOpusEncodingQuality(AudioConfiguration.OPUS_QUALITY_MAX);
 //        config.setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
@@ -47,13 +54,9 @@ public class LavaPlayer {
 
     }
 
-    public static void play(String identifier, Guild guild) {
+    public static void play(String identifier, Guild guild, boolean random) {
         PLAYER_MANAGER.loadItem(identifier, AUDIO_LOAD_HANDLER_MAP.get(guild));
-    }
-
-    public static void playOrdered(String identifier, Guild guild) {
         var audioLoadHandler = AUDIO_LOAD_HANDLER_MAP.get(guild);
-        PLAYER_MANAGER.loadItemOrdered(guild, identifier, audioLoadHandler);
         audioLoadHandler.setLoading(true);
     }
 
@@ -77,8 +80,13 @@ public class LavaPlayer {
         return AUDIO_LOAD_HANDLER_MAP.get(guild).getTrackScheduler().toggleRepeat();
     }
 
-    public static void skip(Guild guild) {
-        AUDIO_LOAD_HANDLER_MAP.get(guild).getTrackScheduler().skip();
+    public static void skip(GenericInteractionCreateEvent event) {
+        AUDIO_LOAD_HANDLER_MAP.get(event.getGuild()).getTrackScheduler().skip();
+        var member = event.getMember();
+        if (member == null) {
+            throw new NullPointerException("Member was null!");
+        }
+        LOGGER.info("Track skipped by " + member.getEffectiveName());
     }
 
     public static void stop(Guild guild) {
@@ -99,5 +107,31 @@ public class LavaPlayer {
 
     public static boolean loadFailed(Guild guild) {
         return AUDIO_LOAD_HANDLER_MAP.get(guild).loadFailed();
+    }
+
+    public static void openAudioConnection(GenericCommandInteractionEvent event) {
+        var guild = event.getGuild();
+        if (guild == null) {
+            event.getHook().editOriginal("Something ent wrong!").queue();
+            return;
+        }
+        var member = event.getMember();
+        if (member == null) {
+            event.getHook().editOriginal("Something ent wrong!").queue();
+            return;
+        }
+        var voiceState = member.getVoiceState();
+        if (voiceState == null) {
+            event.getHook().editOriginal("Something ent wrong!").queue();
+            return;
+        }
+        guild.getAudioManager().openAudioConnection(voiceState.getChannel());
+        INTERACTION_HOOK = event.getHook();
+    }
+
+    public static void updateTrackInfo() {
+        var track = getPlayingTrack(INTERACTION_HOOK.getInteraction().getGuild());
+        INTERACTION_HOOK.editOriginal("Playing: " + track.getInfo().author + " - " + track.getInfo().title + " (" + track.getIdentifier() + ")\n" + "https://youtu.be/" + track.getIdentifier()).queue();
+        INTERACTION_HOOK.editOriginalComponents(ActionRow.of(Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")), Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>")), Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")))).queue();
     }
 }

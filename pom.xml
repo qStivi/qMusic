@@ -23,48 +23,100 @@
 
     <dependencies>
 
-        <!-- JDA -->
+        <!-- region JDA -->
         <!-- https://github.com/DV8FromTheWorld/JDA -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.5</version>
+            <version>5.0.0-beta.6</version>
         </dependency>
+        <!-- endregion -->
 
-        <!-- lavaplayer -->
+        <!-- region lavaplayer -->
         <!-- https://github.com/sedmelluq/lavaplayer -->
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>lavaplayer</artifactId>
             <version>1.3.78</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jsoup</groupId>
+                    <artifactId>jsoup</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.14</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.15.3</version>
+        </dependency>
+        <!-- endregion -->
 
-        <!-- java-dotenv -->
+        <!-- region java-dotenv -->
         <!-- https://mvnrepository.com/artifact/io.github.cdimascio/java-dotenv -->
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>java-dotenv</artifactId>
             <version>5.2.2</version>
         </dependency>
+        <!-- endregion -->
 
-        <!-- Spotify -->
+        <!-- region Spotify -->
         <!-- https://mvnrepository.com/artifact/se.michaelthelin.spotify/spotify-web-api-java -->
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
             <artifactId>spotify-web-api-java</artifactId>
             <version>8.0.0</version>
         </dependency>
+        <!-- endregion -->
 
-        <!-- Google -->
+        <!-- region Google -->
         <!-- https://developers.google.com/explorer-help/code-samples#java -->
         <!-- https://googleapis.dev/java/google-api-services-youtube/latest/index.html -->
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-youtube</artifactId>
-            <version>v3-rev20230123-2.0.0</version>
+            <version>v3-rev20230319-2.0.0</version>
         </dependency>
 
-        <!-- Testing -->
+        <!-- https://github.com/googleapis/google-cloud-java/tree/main/java-texttospeech -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-texttospeech</artifactId>
+            <version>2.14.0</version>
+        </dependency>
+        <!-- endregion -->
+
+        <!-- region Testing -->
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -72,15 +124,16 @@
             <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- endregion -->
 
-        <!-- Logging -->
+        <!-- region Logging -->
         <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.11</version>
         </dependency>
-
+        <!-- endregion -->
 
     </dependencies>
 

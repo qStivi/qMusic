@@ -46,6 +46,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         super.onTrackStart(player, track);
         LOGGER.info("onTrackStart() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ")");
+        LavaPlayer.updateTrackInfo();
     }
 
     @Override
@@ -89,12 +90,6 @@ public class TrackScheduler extends AudioEventAdapter {
         super.onTrackStuck(player, track, thresholdMs, stackTrace);
         LOGGER.info("onTrackStuck() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ") - thresholdMs: " + thresholdMs + " stackTrace: " + Arrays.deepToString(stackTrace));
         // Audio track has been unable to provide us any audio, might want to just start a new track
-    }
-
-    @Override
-    public void onEvent(AudioEvent event) {
-        super.onEvent(event);
-        LOGGER.info("onEvent() - Guild: " + guild.getId());
     }
 
     void queue(AudioTrack track) {

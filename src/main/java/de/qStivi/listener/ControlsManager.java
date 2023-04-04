@@ -22,7 +22,7 @@ public class ControlsManager extends ListenerAdapter {
             case "pause" -> LavaPlayer.pause(guild);
             case "stop" -> LavaPlayer.stop(guild);
             case "repeat" -> LavaPlayer.toggleRepeat(guild);
-            case "skip" -> LavaPlayer.skip(guild);
+            case "skip" -> LavaPlayer.skip(event);
         }
         if (LavaPlayer.isRepeating(guild)) {
             if (!event.getMessage().getContentRaw().toLowerCase().contains("repeat")) event.getHook().editOriginal(event.getMessage().getContentRaw() + "\n\uD83D\uDD01 **__REPEATING__** \uD83D\uDD01").queue();

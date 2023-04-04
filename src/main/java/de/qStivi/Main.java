@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +30,14 @@ public class Main extends ListenerAdapter {
 
     public static JDA JDA;
 
-    public static void main(String[] args) {
-        JDA = JDABuilder.createLight(Properties.DISCORD).addEventListeners(new ControlsManager(), new CommandHandler(), new Main()).setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.VOICE).setActivity(Activity.playing("/help")).build();
+    public static void main(String[] args) throws Exception {
+
+        JDA = JDABuilder.createLight(Properties.DISCORD)
+                .addEventListeners(new ControlsManager(), new CommandHandler(), new Main())
+                .setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
+                .enableCache(CacheFlag.VOICE_STATE)
+                .setMemberCachePolicy(MemberCachePolicy.VOICE)
+                .setActivity(Activity.playing("/help")).build();
 
         List<CommandData> commandDataList = new ArrayList<>();
         for (ICommand<SlashCommandInteractionEvent> command : CommandHandler.SLASH_COMMAND_LIST) {

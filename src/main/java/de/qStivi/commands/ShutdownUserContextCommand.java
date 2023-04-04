@@ -20,7 +20,7 @@ public class ShutdownUserContextCommand implements ICommand<UserContextInteracti
     @Override
     public void handle(UserContextInteractionEvent event) {
         if (event.getJDA().getSelfUser().getId().equals(event.getTarget().getId()) && event.getUser().getId().equals("219108246143631364")) {
-            event.reply("Shutting down...").setEphemeral(true).complete();
+            event.getHook().editOriginal("Shutting down...").complete();
             event.getJDA().shutdown();
         }
     }
