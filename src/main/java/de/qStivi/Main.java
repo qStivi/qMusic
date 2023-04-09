@@ -30,28 +30,15 @@ public class Main extends ListenerAdapter {
 
     public static JDA JDA;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         JDA = JDABuilder.createLight(Properties.DISCORD)
-                .addEventListeners(new ControlsManager(), new CommandHandler(), new Main())
+                .addEventListeners(new ControlsManager(), new CommandHandler())
                 .setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
                 .enableCache(CacheFlag.VOICE_STATE)
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)
                 .setActivity(Activity.playing("/help")).build();
 
-        List<CommandData> commandDataList = new ArrayList<>();
-        for (ICommand<SlashCommandInteractionEvent> command : CommandHandler.SLASH_COMMAND_LIST) {
-            commandDataList.add(command.getCommand());
-        }
-        for (ICommand<UserContextInteractionEvent> command : CommandHandler.USER_CONTEXT_INTERACTION_COMMAND_LIST) {
-            commandDataList.add(command.getCommand());
-        }
-        JDA.updateCommands().addCommands(commandDataList).complete();
-    }
-
-
-    @Override
-    public void onReady(@NotNull ReadyEvent event) {
-        LOGGER.info("Done!");
+        CommandHandler.updateCommands();
     }
 }

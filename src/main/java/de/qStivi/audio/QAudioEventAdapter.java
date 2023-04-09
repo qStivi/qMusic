@@ -1,12 +1,14 @@
 package de.qStivi.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,18 +17,17 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 // TODO Logging
-public class TrackScheduler extends AudioEventAdapter {
+public class QAudioEventAdapter extends AudioEventAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AudioEventAdapter.class);
     private final AudioPlayer player;
-    private final Guild guild;
     private final Queue<AudioTrack> queue = new LinkedBlockingQueue<>();
     private boolean isRepeating = false;
+    private volatile Message message;
 
-    public TrackScheduler(AudioPlayer player, Guild guild) {
+    public QAudioEventAdapter(AudioPlayer player) {
         super();
         this.player = player;
-        this.guild = guild;
         LOGGER.info("TrackScheduler() - New TrackScheduler initialized");
     }
 
@@ -42,13 +43,28 @@ public class TrackScheduler extends AudioEventAdapter {
         LOGGER.info("onPlayerResume()");
     }
 
+
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         super.onTrackStart(player, track);
         LOGGER.info("onTrackStart() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ")");
-        LavaPlayer.updateTrackInfo();
+        updateTrackInfo();
     }
 
+
+    public void updateTrackInfo() {
+        var track = player.getPlayingTrack();
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        while (track == null) {
+            track = player.getPlayingTrack();
+        }
+        message.editMessage("Playing: " + track.getInfo().author + " - " + track.getInfo().title + " (" + track.getIdentifier() + ")\n" + "https://youtu.be/" + track.getIdentifier()).complete();
+        message.editMessageComponents(ActionRow.of(Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")), Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>")), Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")))).complete();
+    }
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         super.onTrackEnd(player, track, endReason);
@@ -95,17 +111,17 @@ public class TrackScheduler extends AudioEventAdapter {
     void queue(AudioTrack track) {
         var trackInfo = track.getInfo().title + " (" + track.getIdentifier() + ")";
         if (player.getPlayingTrack() != null) {
-            LOGGER.info("queue() - Queueing track: " + trackInfo);
+//            LOGGER.info("queue() - Queueing track: " + trackInfo);
             if (queue.offer(track)) {
-                LOGGER.info("queue() - Successfully queued track: " + trackInfo);
+//                LOGGER.info("queue() - Successfully queued track: " + trackInfo);
             } else {
-                LOGGER.error("queue() - Error while queueing track: " + trackInfo);
+//                LOGGER.error("queue() - Error while queueing track: " + trackInfo);
             }
         } else {
-            LOGGER.info("queue() - Playing track: " + trackInfo);
+//            LOGGER.info("queue() - Playing track: " + trackInfo);
             player.playTrack(track);
         }
-        queue.forEach(audioTrack -> LOGGER.info(audioTrack.getIdentifier()));
+//        queue.forEach(audioTrack -> LOGGER.info(audioTrack.getIdentifier()));
     }
 
     Queue<AudioTrack> getQueue() {
@@ -128,5 +144,9 @@ public class TrackScheduler extends AudioEventAdapter {
 
     boolean isRepeating() {
         return isRepeating;
+    }
+
+    public void setMessage(Message message) {
+        this.message = message;
     }
 }

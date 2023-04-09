@@ -3,14 +3,11 @@ package de.qStivi.commands;
 import de.qStivi.NoResultsException;
 import de.qStivi.apis.SpotifyAPI;
 import de.qStivi.apis.YouTubeAPI;
-import de.qStivi.audio.LavaPlayer;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import de.qStivi.audio.QPlayer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +38,10 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
             event.getHook().editOriginal("Something ent wrong!").queue();
             return;
         }
-        LavaPlayer.openAudioConnection(event);
+
+        var lavaPlayer = QPlayer.getInstance(guild);
+
+        lavaPlayer.openAudioConnection(event);
 
         // https://open.spotify.com/playlist/6eLECLM3JbU5JSZfj5p59i?si=082dc01c7c5542d9
         var sID = option.getAsString().substring(34).split("\\?")[0];
@@ -55,19 +55,8 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
             var artists = Arrays.stream(otherTrack.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(" - "));
 
             var id = YouTubeAPI.getSearchResults(name + " - " + artists).get(0).getId().getVideoId();
-            LavaPlayer.play(id, guild, random);
+            lavaPlayer.play(id);
         }
-        while (LavaPlayer.trackIsLoading(guild)) {
-            // TODO Is there a better way to do this?
-        }
-        if (LavaPlayer.loadFailed(guild)) {
-            while (LavaPlayer.trackIsLoading(guild)) {
-                // TODO Is there a better way to do this?
-            }
-        }
-        var track = LavaPlayer.getPlayingTrack(guild);
-        event.getHook().editOriginal("Playing: " + track.getInfo().author + " - " + track.getInfo().title + " (" + track.getIdentifier() + ")\n" + "https://youtu.be/" + track.getIdentifier()).queue();
-        event.getHook().editOriginalComponents(ActionRow.of(Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")), Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>")), Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")))).queue();
     }
 
     @NotNull

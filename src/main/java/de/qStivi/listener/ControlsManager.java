@@ -1,6 +1,6 @@
 package de.qStivi.listener;
 
-import de.qStivi.audio.LavaPlayer;
+import de.qStivi.audio.QPlayer;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -15,21 +15,22 @@ public class ControlsManager extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+        event.deferEdit().queue();
         var type = Objects.requireNonNull(event.getButton()).getId();
         var guild = event.getGuild();
+        var lavaPlayer = QPlayer.getInstance(guild);
         switch (Objects.requireNonNull(type)) {
-            case "play" -> LavaPlayer.resume(guild);
-            case "pause" -> LavaPlayer.pause(guild);
-            case "stop" -> LavaPlayer.stop(guild);
-            case "repeat" -> LavaPlayer.toggleRepeat(guild);
-            case "skip" -> LavaPlayer.skip(event);
+            case "play" -> lavaPlayer.resume();
+            case "pause" -> lavaPlayer.pause();
+            case "stop" -> lavaPlayer.stop();
+            case "repeat" -> lavaPlayer.toggleRepeat();
+            case "skip" -> lavaPlayer.skip(event);
         }
-        if (LavaPlayer.isRepeating(guild)) {
+        if (lavaPlayer.isRepeating()) {
             if (!event.getMessage().getContentRaw().toLowerCase().contains("repeat")) event.getHook().editOriginal(event.getMessage().getContentRaw() + "\n\uD83D\uDD01 **__REPEATING__** \uD83D\uDD01").queue();
         } else {
             var link = event.getMessage().getContentRaw().replaceAll("\n\uD83D\uDD01 \\*\\*__REPEATING__\\*\\* \uD83D\uDD01", "");
             event.getHook().editOriginal(link).queue();
         }
-        event.deferEdit().queue();
     }
 }

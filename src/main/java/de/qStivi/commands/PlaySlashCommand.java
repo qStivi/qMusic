@@ -1,8 +1,6 @@
 package de.qStivi.commands;
 
-import de.qStivi.NoResultsException;
-import de.qStivi.apis.YouTubeAPI;
-import de.qStivi.audio.LavaPlayer;
+import de.qStivi.audio.QPlayer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -11,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> {
@@ -32,7 +29,7 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
-        var randomOption = event.getOption(QUERY);
+        var randomOption = event.getOption(RANDOM);
         var guild = event.getGuild();
 
         var random = false;
@@ -41,22 +38,13 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
             random = randomOption.getAsBoolean();
         }
 
-        LavaPlayer.openAudioConnection(event);
+        var player = QPlayer.getInstance(guild);
 
-        LavaPlayer.play(query, guild, random);
+        player.setMessage(event.getHook().retrieveOriginal().complete());
 
-        while (LavaPlayer.trackIsLoading(guild)) {
-            Thread.onSpinWait();
-        }
-        if (LavaPlayer.loadFailed(guild)) {
-            LOGGER.info("Load Failed!");
-            event.getHook().editOriginal("Load Failed!").queue();
-//            var id = YouTubeAPI.getSearchResults(query).get(0).getId().getVideoId();
-//            LavaPlayer.play(id, guild);
-//            while (LavaPlayer.trackIsLoading(guild)) {
-//                Thread.onSpinWait();
-//            }
-        }
+        player.openAudioConnection(event);
+
+        player.play(query);
     }
 
     @NotNull

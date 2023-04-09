@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 
 
-public class AudioPlayerSendHandler implements AudioSendHandler {
+public class QAudioSendHandler implements AudioSendHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AudioSendHandler.class);
     private final AudioPlayer audioPlayer;
     private AudioFrame lastFrame;
 
 
-    public AudioPlayerSendHandler(AudioPlayer audioPlayer) {
+    public QAudioSendHandler(AudioPlayer audioPlayer) {
         LOGGER.info("new AudioPlayerSendHandler");
         this.audioPlayer = audioPlayer;
     }
