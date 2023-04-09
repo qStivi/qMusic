@@ -1,7 +1,6 @@
 package de.qStivi.commands;
 
 import de.qStivi.Main;
-import de.qStivi.NoResultsException;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +23,7 @@ public class CommandHandler extends ListenerAdapter {
 
     static {
         LOGGER.info("Registering commands.");
-        registerSlashCommands(new PlaySlashCommand());
+        registerSlashCommands(new PlaySlashCommand(), new EchoSlashCommand());
         registerUserContextCommands(new ShutdownUserContextCommand());
     }
 
@@ -42,6 +40,7 @@ public class CommandHandler extends ListenerAdapter {
 
     /**
      * Registers the given commands.
+     *
      * @param commands The commands to register.
      */
     private static void registerSlashCommands(ICommand<SlashCommandInteractionEvent>... commands) {
@@ -50,6 +49,7 @@ public class CommandHandler extends ListenerAdapter {
 
     /**
      * Registers the given commands.
+     *
      * @param commands The commands to register.
      */
     private static void registerUserContextCommands(ICommand<UserContextInteractionEvent>... commands) {
@@ -62,23 +62,14 @@ public class CommandHandler extends ListenerAdapter {
             if (command.getCommand().getName().equals(event.getName())) {
                 event.deferReply().complete();
                 new Thread(() -> {
-                    try {
-                        command.handle((SlashCommandInteractionEvent) event);
-                    } catch (NoResultsException | IOException e) {
-                        LOGGER.error(e.getMessage());
-                        event.getHook().editOriginal(e.getMessage()).queue();
-                    }
+                    command.handle((SlashCommandInteractionEvent) event);
                 }).start();
             }
         }
 
         for (var command : USER_CONTEXT_INTERACTION_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-                try {
-                    command.handle((UserContextInteractionEvent) event);
-                } catch (NoResultsException | IOException e) {
-                    event.reply(e.getMessage()).queue();
-                }
+                command.handle((UserContextInteractionEvent) event);
             }
         }
     }

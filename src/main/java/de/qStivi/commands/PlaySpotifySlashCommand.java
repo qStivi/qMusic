@@ -31,7 +31,7 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
+    public void handle(SlashCommandInteractionEvent event) {
         var option = event.getOption(COMMAND_NAME);
         var guild = event.getGuild();
         if (option == null) {
@@ -46,16 +46,20 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
         // https://open.spotify.com/playlist/6eLECLM3JbU5JSZfj5p59i?si=082dc01c7c5542d9
         var sID = option.getAsString().substring(34).split("\\?")[0];
         LOGGER.info(sID);
-        var playlist = SpotifyAPI.getPlaylist(sID);
-        var tracks = playlist.getTracks().getItems();
+        try {
+            var playlist = SpotifyAPI.getPlaylist(sID);
+            var tracks = playlist.getTracks().getItems();
 
-        for (PlaylistTrack x : tracks) {
-            var otherTrack = SpotifyAPI.getTrack(x.getTrack().getId());
-            var name = otherTrack.getName();
-            var artists = Arrays.stream(otherTrack.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(" - "));
+            for (PlaylistTrack x : tracks) {
+                var otherTrack = SpotifyAPI.getTrack(x.getTrack().getId());
+                var name = otherTrack.getName();
+                var artists = Arrays.stream(otherTrack.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(" - "));
 
-            var id = YouTubeAPI.getSearchResults(name + " - " + artists).get(0).getId().getVideoId();
-            lavaPlayer.play(id);
+                var id = YouTubeAPI.getSearchResults(name + " - " + artists).get(0).getId().getVideoId();
+                lavaPlayer.play(id);
+            }
+        } catch (Exception e) {
+            event.getHook().editOriginal("Something went wrong!").queue();
         }
     }
 

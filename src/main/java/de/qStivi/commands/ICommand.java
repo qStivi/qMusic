@@ -12,7 +12,7 @@ public interface ICommand<T extends GenericCommandInteractionEvent> {
     @NotNull
     CommandData getCommand();
 
-    void handle(T event) throws NoResultsException, IOException;
+    void handle(T event);
 
     @NotNull
     String getName();

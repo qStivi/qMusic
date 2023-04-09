@@ -23,7 +23,6 @@ public class QAudioSendHandler implements AudioSendHandler {
 
     @Override
     public boolean canProvide() {
-//        LOGGER.info("canProvide");
         lastFrame = audioPlayer.provide();
         return lastFrame != null;
     }
