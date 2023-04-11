@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 // TODO Logging
 public class QAudioEventAdapter extends AudioEventAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AudioEventAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QAudioEventAdapter.class);
     private final AudioPlayer player;
     private final Queue<AudioTrack> queue = new LinkedBlockingQueue<>();
     private boolean isRepeating = false;

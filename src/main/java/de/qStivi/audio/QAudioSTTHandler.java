@@ -1,8 +1,10 @@
 package de.qStivi.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
-import net.dv8tion.jda.api.audio.*;
-import net.dv8tion.jda.api.entities.Guild;
+import de.qStivi.apis.stt.SpeechToText;
+import net.dv8tion.jda.api.audio.AudioReceiveHandler;
+import net.dv8tion.jda.api.audio.CombinedAudio;
+import net.dv8tion.jda.api.audio.OpusPacket;
+import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,22 +12,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 
-public class QAudioEchoHandler implements AudioReceiveHandler, AudioSendHandler {
+public class QAudioSTTHandler implements AudioReceiveHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QAudioEchoHandler.class);
     private final Queue<byte[]> queue = new ConcurrentLinkedQueue<>();
+    private final SpeechToText speechToText;
 
-    public QAudioEchoHandler() {
+    public QAudioSTTHandler() {
+        this.speechToText = new SpeechToText();
+    }
 
-        LOGGER.info("new AudioPlayerSendHandler");
+    public Queue<byte[]> getQueue() {
+        return queue;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class QAudioEchoHandler implements AudioReceiveHandler, AudioSendHandler 
 
     @Override
     public void handleEncodedAudio(@NotNull OpusPacket packet) {
-        handleAudio(packet.getAudioData(1));
+        handleAudio(packet.getOpusAudio());
     }
 
     @Override
@@ -64,11 +68,12 @@ public class QAudioEchoHandler implements AudioReceiveHandler, AudioSendHandler 
     }
 
     private void handleAudio(byte[] byteArray) {
-        if (isZeroArray(byteArray)) {
-            return;
-        }
-        queue.offer(byteArray);
-        LOGGER.debug("handleAudio() - " + Arrays.toString(byteArray));
+//        if (isZeroArray(byteArray)) {
+//            return;
+//        }
+//        queue.offer(byteArray);
+        speechToText.sendRequest(byteArray);
+//        LOGGER.debug("handleAudio() - " + Arrays.toString(byteArray));
     }
 
     private boolean isZeroArray(byte[] array) {
@@ -78,27 +83,5 @@ public class QAudioEchoHandler implements AudioReceiveHandler, AudioSendHandler 
             }
         }
         return true;
-    }
-
-    @Override
-    public boolean canProvide() {
-        boolean isQueueEmpty = queue.isEmpty();
-        LOGGER.debug("canProvide() - " + Arrays.toString(queue.peek()));
-        LOGGER.debug("canProvide() - " + !isQueueEmpty);
-        return !isQueueEmpty;
-    }
-
-    @Nullable
-    @Override
-    public ByteBuffer provide20MsAudio() {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(queue.poll());
-        LOGGER.debug("provide20MsAudio() - " + queue.size());
-        LOGGER.debug("provide20MsAudio() - " + Arrays.toString(byteBuffer.array()));
-        return byteBuffer;
-    }
-
-    @Override
-    public boolean isOpus() {
-        return false;
     }
 }

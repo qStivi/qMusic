@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 
 public class QAudioSendHandler implements AudioSendHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AudioSendHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QAudioSendHandler.class);
     private final AudioPlayer audioPlayer;
     private AudioFrame lastFrame;
 
