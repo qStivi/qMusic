@@ -14,7 +14,7 @@ public class SpeechToText {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpeechToText.class);
 
     private final ClientStream<StreamingRecognizeRequest> clientStream;
-    private final ResponseObserver<StreamingRecognizeResponse> responseObserver;
+    public final QResponseObserver responseObserver;
     private boolean completed = false;
 
     public SpeechToText() {
@@ -26,8 +26,7 @@ public class SpeechToText {
         }
         RecognitionConfig recognitionConfig = RecognitionConfig.newBuilder()
                 .setEncoding(RecognitionConfig.AudioEncoding.LINEAR16)
-//                .setEncoding(RecognitionConfig.AudioEncoding.FLAC)
-                .setLanguageCode("de-DE")
+                .setLanguageCode("en-US")
                 .setSampleRateHertz(48000)
                 .build();
         StreamingRecognitionConfig streamingRecognitionConfig = StreamingRecognitionConfig.newBuilder().setConfig(recognitionConfig).build();

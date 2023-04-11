@@ -2,6 +2,7 @@ package de.qStivi.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -45,6 +46,7 @@ public class QPlayer {
         this.audioPlayerManager.addListener(this.QAudioEventAdapter);
 
         AudioSourceManagers.registerRemoteSources(playerManager);
+        AudioSourceManagers.registerLocalSource(playerManager);
         playerManager.setTrackStuckThreshold(10 * 1000);
         playerManager.enableGcMonitoring();
     }
