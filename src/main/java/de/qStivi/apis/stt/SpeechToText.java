@@ -15,6 +15,7 @@ public class SpeechToText {
 
     private final ClientStream<StreamingRecognizeRequest> clientStream;
     private final ResponseObserver<StreamingRecognizeResponse> responseObserver;
+    private boolean completed = false;
 
     public SpeechToText() {
         try (SpeechClient client = SpeechClient.create()) {
@@ -25,7 +26,8 @@ public class SpeechToText {
         }
         RecognitionConfig recognitionConfig = RecognitionConfig.newBuilder()
                 .setEncoding(RecognitionConfig.AudioEncoding.LINEAR16)
-                .setLanguageCode("en-US")
+//                .setEncoding(RecognitionConfig.AudioEncoding.FLAC)
+                .setLanguageCode("de-DE")
                 .setSampleRateHertz(48000)
                 .build();
         StreamingRecognitionConfig streamingRecognitionConfig = StreamingRecognitionConfig.newBuilder().setConfig(recognitionConfig).build();
@@ -38,9 +40,14 @@ public class SpeechToText {
 
     public void closeConnection()  {
         responseObserver.onComplete();
+        this.completed = true;
+        LOGGER.info("Connection closed!");
     }
 
     public void sendRequest(byte[] data) {
+        if (completed) {
+            return;
+        }
         var request =
                 StreamingRecognizeRequest.newBuilder()
                         .setAudioContent(ByteString.copyFrom(data))

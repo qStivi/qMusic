@@ -6,35 +6,29 @@ import net.dv8tion.jda.api.audio.CombinedAudio;
 import net.dv8tion.jda.api.audio.OpusPacket;
 import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.managers.AudioManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class QAudioSTTHandler implements AudioReceiveHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QAudioEchoHandler.class);
-    private final Queue<byte[]> queue = new ConcurrentLinkedQueue<>();
     private final SpeechToText speechToText;
+    private final AudioManager audioManager;
 
-    public QAudioSTTHandler() {
+    public QAudioSTTHandler(AudioManager audioManager) {
+        this.audioManager = audioManager;
         this.speechToText = new SpeechToText();
     }
 
-    public Queue<byte[]> getQueue() {
-        return queue;
+    public SpeechToText getSpeechToText() {
+        return speechToText;
     }
 
     @Override
     public boolean canReceiveCombined() {
-        return true;
+        return audioManager.isConnected();
     }
 
     @Override
@@ -54,13 +48,42 @@ public class QAudioSTTHandler implements AudioReceiveHandler {
 
     @Override
     public void handleCombinedAudio(@NotNull CombinedAudio combinedAudio) {
-        handleAudio(combinedAudio.getAudioData(1));
+        var bigEndianAudioStereo = combinedAudio.getAudioData(1);
+        var littleEndianAudioMono = convertAudioData(bigEndianAudioStereo);
+        speechToText.sendRequest(littleEndianAudioMono);
     }
 
     @Override
     public void handleUserAudio(@NotNull UserAudio userAudio) {
         handleAudio(userAudio.getAudioData(1));
     }
+
+    private byte[] convertAudioData(byte[] audioBytes) {
+        byte[] monoLittleEndianBytes = new byte[audioBytes.length / 2]; // Mono data will be half the size of stereo data
+
+        for (int i = 0; i < audioBytes.length; i += 4) {
+            // Extract left channel sample (big-endian) from stereo data
+            int leftSample = ((audioBytes[i] & 0xFF) << 8) | (audioBytes[i + 1] & 0xFF);
+
+            // Extract right channel sample (big-endian) from stereo data
+            int rightSample = ((audioBytes[i + 2] & 0xFF) << 8) | (audioBytes[i + 3] & 0xFF);
+
+            // Average left and right channel samples to convert to mono
+            int monoSample = (leftSample + rightSample) / 2;
+
+            // Convert mono sample to little-endian byte representation
+            byte lowByte = (byte) (monoSample & 0xFF);
+            byte highByte = (byte) ((monoSample >> 8) & 0xFF);
+
+            // Store little-endian mono sample in output byte array
+            monoLittleEndianBytes[i / 2] = lowByte;
+            monoLittleEndianBytes[(i / 2) + 1] = highByte;
+        }
+
+        return monoLittleEndianBytes;
+    }
+
+
 
     @Override
     public boolean includeUserInCombinedAudio(@NotNull User user) {

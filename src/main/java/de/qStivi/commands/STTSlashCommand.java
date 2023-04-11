@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+
 public class STTSlashCommand implements ICommand<SlashCommandInteractionEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(STTSlashCommand.class);
 
@@ -23,8 +25,10 @@ public class STTSlashCommand implements ICommand<SlashCommandInteractionEvent> {
         event.getHook().editOriginal("yee").queue();
         var audioManager = event.getGuild().getAudioManager();
         audioManager.openAudioConnection(event.getMember().getVoiceState().getChannel());
-        var STTHandler = new QAudioSTTHandler();
+        var STTHandler = new QAudioSTTHandler(audioManager);
         audioManager.setReceivingHandler(STTHandler);
+        var currentTime = System.currentTimeMillis();
+        var maxLength = Duration.ofSeconds(10).toMillis();
     }
 
     @NotNull
