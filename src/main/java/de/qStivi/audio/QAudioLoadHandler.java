@@ -8,6 +8,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class QAudioLoadHandler implements AudioLoadResultHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QAudioLoadHandler.class);
@@ -32,7 +35,12 @@ public class QAudioLoadHandler implements AudioLoadResultHandler {
     @Override
     public void playlistLoaded(AudioPlaylist playlist) {
         LOGGER.info("Playlist loaded! - " + playlist.getName());
-        for (AudioTrack track : playlist.getTracks()) {
+
+        var shuffled = new ArrayList<>(playlist.getTracks());
+
+        Collections.shuffle(shuffled);
+
+        for (AudioTrack track : shuffled) {
             qAudioEventAdapter.queue(track);
         }
     }

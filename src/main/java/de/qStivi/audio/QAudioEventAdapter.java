@@ -46,14 +46,13 @@ public class QAudioEventAdapter extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        super.onTrackStart(player, track);
+//        super.onTrackStart(player, track);
         LOGGER.info("onTrackStart() - Track: " + track.getInfo().title + " (" + track.getIdentifier() + ")");
-        updateTrackInfo();
+        updateTrackInfo(track);
     }
 
 
-    public void updateTrackInfo() {
-        var track = player.getPlayingTrack();
+    public void updateTrackInfo(AudioTrack track) {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -62,8 +61,23 @@ public class QAudioEventAdapter extends AudioEventAdapter {
         while (track == null) {
             track = player.getPlayingTrack();
         }
-        message.editMessage("Playing: " + track.getInfo().author + " - " + track.getInfo().title + " (" + track.getIdentifier() + ")\n" + "https://youtu.be/" + track.getIdentifier()).complete();
-        message.editMessageComponents(ActionRow.of(Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")), Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>")), Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")))).complete();
+        var sb = new StringBuilder();
+        if (isRepeating) {
+            sb.append("Repeating: ");
+        } else {
+            sb.append("Playing: ");
+        }
+        sb.append(track.getInfo().author)
+                .append(" - ")
+                .append(track.getInfo().title)
+                .append(" (")
+                .append(track.getIdentifier())
+                .append(")\n")
+                .append("https://youtu.be/")
+                .append(track.getIdentifier());
+
+        message.editMessage(sb.toString()).queue();
+        if (message.getComponents().isEmpty()) message.editMessageComponents(ActionRow.of(Button.primary("play", Emoji.fromFormatted("<:play:929131671004012584>")), Button.primary("pause", Emoji.fromFormatted("<:pause:929131670957854721>")), Button.primary("stop", Emoji.fromFormatted("<:stop:929130911382007848>")), Button.primary("skip", Emoji.fromFormatted("<:skip:929131670660067370>")), Button.primary("repeat", Emoji.fromFormatted("<:repeat:929131670941089864>")))).queue();
     }
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {

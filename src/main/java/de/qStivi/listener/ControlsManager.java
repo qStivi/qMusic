@@ -26,11 +26,11 @@ public class ControlsManager extends ListenerAdapter {
             case "repeat" -> lavaPlayer.toggleRepeat();
             case "skip" -> lavaPlayer.skip(event);
         }
-        if (lavaPlayer.isRepeating()) {
-            if (!event.getMessage().getContentRaw().toLowerCase().contains("repeat")) event.getHook().editOriginal(event.getMessage().getContentRaw() + "\n\uD83D\uDD01 **__REPEATING__** \uD83D\uDD01").queue();
-        } else {
-            var link = event.getMessage().getContentRaw().replaceAll("\n\uD83D\uDD01 \\*\\*__REPEATING__\\*\\* \uD83D\uDD01", "");
-            event.getHook().editOriginal(link).queue();
-        }
+//        if (lavaPlayer.isRepeating()) {
+//            if (!event.getMessage().getContentRaw().toLowerCase().contains("repeat")) event.getHook().editOriginal(event.getMessage().getContentRaw() + "\n\uD83D\uDD01 **__REPEATING__** \uD83D\uDD01").queue();
+//        } else {
+//            var link = event.getMessage().getContentRaw().replaceAll("\n\uD83D\uDD01 \\*\\*__REPEATING__\\*\\* \uD83D\uDD01", "");
+//            event.getHook().editOriginal(link).queue();
+//        }
     }
 }

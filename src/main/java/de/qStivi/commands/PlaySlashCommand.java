@@ -28,6 +28,8 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
+        event.getHook().editOriginal("Loading...").complete();
+
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
         var randomOption = event.getOption(RANDOM);
         var guild = event.getGuild();

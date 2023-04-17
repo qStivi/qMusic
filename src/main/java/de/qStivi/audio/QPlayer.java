@@ -51,7 +51,6 @@ public class QPlayer {
 
     public void play(String identifier) {
         playerManager.loadItem(identifier, QAudioLoadHandler);
-        QAudioEventAdapter.updateTrackInfo();
     }
 
     public void resume() {
