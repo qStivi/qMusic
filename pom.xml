@@ -159,6 +159,12 @@
             <artifactId>service</artifactId>
             <version>0.12.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.microsoft.cognitiveservices.speech</groupId>
+            <artifactId>client-sdk</artifactId>
+            <version>1.27.0</version>
+        </dependency>
+
 
     </dependencies>
 

@@ -16,6 +16,8 @@ public abstract class Properties {
     public static String YOUTUBE_API_KEY;
     public static String TTS_API_KEY;
     public static String CHAT_API_KEY;
+    public static String TTS_MICROSOFT_API_KEY;
+    public static String TTS_MICROSOFT_API_REGION;
 
     static {
         var fileName = "MusicBot.properties";
@@ -37,6 +39,8 @@ public abstract class Properties {
             properties.setProperty("youtube.api.key", "");
             properties.setProperty("tts.api.key", "");
             properties.setProperty("chat.api.key", "");
+            properties.setProperty("tts.microsoft.key", "");
+            properties.setProperty("tts.microsoft.region", "");
 
             try {
                 properties.store(new FileWriter(fileName), "Please enter your API keys");
@@ -57,8 +61,10 @@ public abstract class Properties {
         YOUTUBE_API_KEY = properties.getProperty("youtube.api.key");
         TTS_API_KEY = properties.getProperty("tts.api.key");
         CHAT_API_KEY = properties.getProperty("chat.api.key");
+        TTS_MICROSOFT_API_KEY = properties.getProperty("tts.microsoft.key");
+        TTS_MICROSOFT_API_REGION = properties.getProperty("tts.microsoft.region");
 
-        if (DISCORD == null || DISCORD.isEmpty() || SPOTIFY_CLIENT_SECRET == null || SPOTIFY_CLIENT_SECRET.isEmpty() || SPOTIFY_CLIENT_ID == null || SPOTIFY_CLIENT_ID.isEmpty() || YOUTUBE_API_KEY == null || YOUTUBE_API_KEY.isEmpty() || TTS_API_KEY.isEmpty() || CHAT_API_KEY.isEmpty()) {
+        if (DISCORD == null || DISCORD.isEmpty() || SPOTIFY_CLIENT_SECRET == null || SPOTIFY_CLIENT_SECRET.isEmpty() || SPOTIFY_CLIENT_ID == null || SPOTIFY_CLIENT_ID.isEmpty() || YOUTUBE_API_KEY == null || YOUTUBE_API_KEY.isEmpty() || TTS_API_KEY.isEmpty() || CHAT_API_KEY.isEmpty() || TTS_MICROSOFT_API_KEY.isEmpty() || TTS_MICROSOFT_API_REGION.isEmpty()) {
             LOGGER.error("Error while getting properties! Some properties are empty.");
             System.exit(-1);
         }

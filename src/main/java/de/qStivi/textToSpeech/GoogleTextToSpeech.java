@@ -11,7 +11,6 @@ public class GoogleTextToSpeech extends TextToSpeech {
     private final TextToSpeechClient client;
     private final VoiceSelectionParams voice;
     private final AudioConfig audioConfig;
-    private final Thread thread;
 
     public GoogleTextToSpeech() {
         this.voice = VoiceSelectionParams.newBuilder()
@@ -45,13 +44,5 @@ public class GoogleTextToSpeech extends TextToSpeech {
                 }
             }
         });
-    }
-
-    public void start() {
-        thread.start();
-    }
-
-    public void stop() {
-        thread.interrupt();
     }
 }

@@ -3,6 +3,7 @@ package de.qStivi.textToSpeech;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -12,7 +13,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public abstract class TextToSpeech {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
     private final ConcurrentLinkedQueue<String> textQueue = new ConcurrentLinkedQueue<>();
+    /**
+     * 48KHz 16bit stereo signed BigEndian PCM in 20ms chunks
+     */
     private final ConcurrentLinkedQueue<byte[]> audioQueue = new ConcurrentLinkedQueue<>();
+    Thread thread;
 
 
     public boolean hasText() {
@@ -77,5 +82,14 @@ public abstract class TextToSpeech {
         }
 
         return audioChunks;
+    }
+
+
+    public void start() {
+        thread.start();
+    }
+
+    public void stop() {
+        thread.interrupt();
     }
 }

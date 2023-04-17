@@ -1,6 +1,7 @@
 package de.qStivi;
 
 import de.qStivi.commands.CommandHandler;
+import de.qStivi.listener.ConnectionListener;
 import de.qStivi.listener.ControlsManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -20,10 +21,10 @@ public class Main extends ListenerAdapter {
 
     public static JDA JDA;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         JDA = JDABuilder.createLight(Properties.DISCORD)
-                .addEventListeners(new ControlsManager(), new CommandHandler())
+                .addEventListeners(new ControlsManager(), new CommandHandler(), new ConnectionListener())
                 .setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
                 .enableCache(CacheFlag.VOICE_STATE)
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)

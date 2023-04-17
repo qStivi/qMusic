@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public abstract class SpeechToText {
 
 
+    public Thread thread;
+
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     private final ConcurrentLinkedQueue<String> responseQueue = new ConcurrentLinkedQueue<>();
@@ -61,5 +63,13 @@ public abstract class SpeechToText {
 
     public byte[] getAudio() {
         return audioQueue.poll();
+    }
+
+    public void start() {
+        thread.start();
+    }
+
+    public void stop() {
+        thread.interrupt();
     }
 }

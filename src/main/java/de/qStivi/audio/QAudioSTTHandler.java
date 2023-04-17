@@ -1,9 +1,16 @@
 package de.qStivi.audio;
 
+import com.microsoft.cognitiveservices.speech.SpeechSynthesisOutputFormat;
+import com.microsoft.cognitiveservices.speech.audio.AudioInputStream;
+import com.microsoft.cognitiveservices.speech.audio.AudioStreamFormat;
+import com.microsoft.cognitiveservices.speech.audio.PullAudioInputStreamCallback;
+import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import de.qStivi.chatBot.ChatGPT3;
 import de.qStivi.chatBot.Message;
-import de.qStivi.speechToText.ContinuousGoogleTextToSpeech;
-import de.qStivi.textToSpeech.GoogleTextToSpeech;
+import de.qStivi.speechToText.ContinuousGoogleSpeechToText;
+import de.qStivi.speechToText.LanguageDetection;
+import de.qStivi.speechToText.SpeechToText;
+import de.qStivi.textToSpeech.MicrosoftTextToSpeech;
 import net.dv8tion.jda.api.audio.*;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -12,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -19,15 +28,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class QAudioSTTHandler implements AudioReceiveHandler, AudioSendHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(QAudioEchoHandler.class);
     public final Queue<byte[]> queue = new ConcurrentLinkedQueue<>();
-    private final ContinuousGoogleTextToSpeech speechToText;
+    private final SpeechToText speechToText;
     private final AudioManager audioManager;
+
 
     public QAudioSTTHandler(AudioManager audioManager) {
         this.audioManager = audioManager;
-        this.speechToText = new ContinuousGoogleTextToSpeech();
+        this.speechToText = new LanguageDetection();
         this.speechToText.start();
-        var tts = new GoogleTextToSpeech();
-        var chatBot = new ChatGPT3("You are on a public server in a voice chat talking to people. You like to talk about Games, Anime, Memes and random trivia. Sometimes you tell the user that you don't want to answer a question because of a reason you think of. Then you tell him a random fact of the day.");
+//        var tts = new GoogleTextToSpeech();
+        var tts = new MicrosoftTextToSpeech();
+        var chatBot = new ChatGPT3("You are not an Assistant. You are just some gamer. You are on a Discord public server in a voice chat talking to people. You like to talk about Games, Anime, Memes and random trivia. Sometimes you tell the user that you don't want to answer a question because of a reason you think of. Then you tell him a random fact of the day.");
         tts.start();
         new Thread(() -> {
             while (true) {
@@ -72,7 +83,8 @@ public class QAudioSTTHandler implements AudioReceiveHandler, AudioSendHandler {
 
     @Override
     public void handleCombinedAudio(@NotNull CombinedAudio combinedAudio) {
-        handleAudio(combinedAudio.getAudioData(1));
+        var bigEndianAudioStereo = combinedAudio.getAudioData(1);
+        handleAudio(bigEndianAudioStereo);
     }
 
     @Override
@@ -86,6 +98,9 @@ public class QAudioSTTHandler implements AudioReceiveHandler, AudioSendHandler {
         return !user.isBot();
     }
 
+    /**
+     * byte array size: 3840
+     */
     private void handleAudio(byte[] byteArray) {
 //        var bigEndianAudioStereo = combinedAudio.getAudioData(1);
 //        var littleEndianAudioMono = convertAudioDataDiscordToGoogle(bigEndianAudioStereo);

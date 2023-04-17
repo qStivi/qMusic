@@ -11,14 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class ContinuousGoogleTextToSpeech extends SpeechToText implements ResponseObserver<StreamingRecognizeResponse> {
+public class ContinuousGoogleSpeechToText extends SpeechToText implements ResponseObserver<StreamingRecognizeResponse> {
 
     private static final int STREAMING_LIMIT = 290000; // ~5 minutes
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-    private final Thread thread;
     private ClientStream<StreamingRecognizeRequest> clientStream;
 
-    public ContinuousGoogleTextToSpeech() {
+    public ContinuousGoogleSpeechToText() {
         reset();
 
         this.thread = new Thread(() -> {
@@ -35,6 +34,7 @@ public class ContinuousGoogleTextToSpeech extends SpeechToText implements Respon
                 if (estimatedTime >= STREAMING_LIMIT) {
                     LOGGER.info("Time limit reached. Restarting stream.");
                     reset();
+                    startTime = System.currentTimeMillis();
                 }
             }
         });
@@ -73,13 +73,7 @@ public class ContinuousGoogleTextToSpeech extends SpeechToText implements Respon
         this.clientStream.send(configRequest);
     }
 
-    public void start() {
-        thread.start();
-    }
 
-    public void stop() {
-        thread.interrupt();
-    }
 
     @Override
     public void onStart(StreamController controller) {
