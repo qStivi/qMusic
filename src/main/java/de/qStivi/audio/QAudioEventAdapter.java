@@ -86,8 +86,8 @@ public class QAudioEventAdapter extends AudioEventAdapter {
 
         if (endReason.mayStartNext) {
             if (isRepeating) {
-//                player.playTrack(track.makeClone());
-                player.playTrack(queue.poll());
+                player.playTrack(track.makeClone());
+//                player.playTrack(queue.poll());
             } else {
                 player.playTrack(queue.poll());
             }
@@ -144,6 +144,7 @@ public class QAudioEventAdapter extends AudioEventAdapter {
 
     boolean toggleRepeat() {
         isRepeating = !isRepeating;
+        updateTrackInfo(player.getPlayingTrack());
         return isRepeating;
     }
 
