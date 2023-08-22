@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> {
+public class PlayYoutubeSlashCommand implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlaySlashCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlayYoutubeSlashCommand.class);
 
     private static final String QUERY = "query";
     private static final String RANDOM = "random";
@@ -46,13 +46,13 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
 
         player.openAudioConnection(event);
 
-        player.playQuery(query);
+        player.play(query);
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "play";
+        return "youtube";
     }
 
     @NotNull

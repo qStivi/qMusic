@@ -1,8 +1,11 @@
 package de.qStivi.audio;
 
+import com.google.api.services.youtube.model.SearchResult;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import de.qStivi.NoResultsException;
+import de.qStivi.apis.YouTubeAPI;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -10,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -106,6 +110,10 @@ public class QPlayer {
             event.getHook().editOriginal("Something ent wrong!").queue();
             return;
         }
+        if (!voiceState.inAudioChannel()) {
+            event.getHook().editOriginal("Please join a channel first.").queue();
+            return;
+        }
         var audioManager = guild.getAudioManager();
         audioManager.openAudioConnection(voiceState.getChannel());
         audioManager.setSendingHandler(new QAudioSendHandler(audioPlayerManager));
@@ -113,5 +121,14 @@ public class QPlayer {
 
     public void setMessage(Message message) {
         QAudioEventAdapter.setMessage(message);
+    }
+
+    public void playQuery(String query) {
+        try {
+            var identifier = YouTubeAPI.getSearchResults(query).get(0).getId().getVideoId();
+            playerManager.loadItem(identifier, QAudioLoadHandler);
+        } catch (IOException | NoResultsException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
