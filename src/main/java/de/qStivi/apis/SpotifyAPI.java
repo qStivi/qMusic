@@ -2,7 +2,7 @@ package de.qStivi.apis;
 
 
 import de.qStivi.NoResultsException;
-import de.qStivi.Properties;
+import de.qStivi.BotProperties;
 import org.apache.hc.core5.http.ParseException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public abstract class SpotifyAPI {
 
     static {
         LOGGER.info("Initializing Spotify API...");
-        API = new SpotifyApi.Builder().setClientId(Properties.SPOTIFY_CLIENT_ID).setClientSecret(Properties.SPOTIFY_CLIENT_SECRET).build();
+        API = new SpotifyApi.Builder().setClientId(BotProperties.SPOTIFY_CLIENT_ID).setClientSecret(BotProperties.SPOTIFY_CLIENT_SECRET).build();
         try {
             var clientCredentials = API.clientCredentials().build().execute();
             API.setAccessToken(clientCredentials.getAccessToken());

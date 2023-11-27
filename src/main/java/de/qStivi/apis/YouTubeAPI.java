@@ -10,7 +10,7 @@ import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 import de.qStivi.NoResultsException;
-import de.qStivi.Properties;
+import de.qStivi.BotProperties;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class YouTubeAPI {
         }
 
         YouTube.Builder builder = new YouTube.Builder(tt, GsonFactory.getDefaultInstance(), null);
-        builder.setGoogleClientRequestInitializer(new YouTubeRequestInitializer(Properties.YOUTUBE_API_KEY));
+        builder.setGoogleClientRequestInitializer(new YouTubeRequestInitializer(BotProperties.YOUTUBE_API_KEY));
         builder.setApplicationName("qMusic");
         API = builder.build();
         LOGGER.info("YouTube API successfully initialized!");
