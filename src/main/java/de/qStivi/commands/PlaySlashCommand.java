@@ -1,6 +1,10 @@
 package de.qStivi.commands;
 
-import de.qStivi.audio.QPlayer;
+import de.qStivi.Main;
+import de.qStivi.audio.AudioLoader;
+import de.qStivi.audio.GuildMusicManager;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -40,13 +44,39 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
             random = randomOption.getAsBoolean();
         }
 
-        var player = QPlayer.getInstance(guild);
+//        var player = QPlayer.getInstance(guild);
 
-        player.setMessage(event.getHook().retrieveOriginal().complete());
+//        player.setMessage(event.getHook().retrieveOriginal().complete());
 
-        player.openAudioConnection(event);
+        // We are already connected, go ahead and play
+        if (guild.getSelfMember().getVoiceState().inAudioChannel()) {
+            event.deferReply(false).queue();
+        } else {
+            // Connect to VC first
+            joinHelper(event);
+        }
 
-        player.playQuery(query);
+        Main.LAVALINK.getOrCreateLink(event.getGuild().getIdLong()).loadItem(query).subscribe(new AudioLoader(event, GuildMusicManager.getInstance(guild.getIdLong(), Main.LAVALINK)));
+
+
+
+//        player.openAudioConnection(event);
+//
+//        player.playQuery(query);
+    }
+
+    // Makes sure that the bot is in a voice channel!
+    private void joinHelper(SlashCommandInteractionEvent event) {
+        final Member member = event.getMember();
+        final GuildVoiceState memberVoiceState = member.getVoiceState();
+
+        if (memberVoiceState.inAudioChannel()) {
+            event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
+        }
+
+        GuildMusicManager.getInstance(event.getGuild().getIdLong(), Main.LAVALINK);
+
+        event.getHook().editOriginal("Joining your channel!").queue();
     }
 
     @NotNull

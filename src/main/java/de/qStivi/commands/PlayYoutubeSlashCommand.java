@@ -1,6 +1,5 @@
 package de.qStivi.commands;
 
-import de.qStivi.audio.QPlayer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -28,25 +27,25 @@ public class PlayYoutubeSlashCommand implements ICommand<SlashCommandInteraction
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        event.getHook().editOriginal("Loading...").complete();
-
-        var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
-        var randomOption = event.getOption(RANDOM);
-        var guild = event.getGuild();
-
-        var random = false;
-
-        if (randomOption != null) {
-            random = randomOption.getAsBoolean();
-        }
-
-        var player = QPlayer.getInstance(guild);
-
-        player.setMessage(event.getHook().retrieveOriginal().complete());
-
-        player.openAudioConnection(event);
-
-        player.play(query);
+//        event.getHook().editOriginal("Loading...").complete();
+//
+//        var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
+//        var randomOption = event.getOption(RANDOM);
+//        var guild = event.getGuild();
+//
+//        var random = false;
+//
+//        if (randomOption != null) {
+//            random = randomOption.getAsBoolean();
+//        }
+//
+//        var player = QPlayer.getInstance(guild);
+//
+//        player.setMessage(event.getHook().retrieveOriginal().complete());
+//
+//        player.openAudioConnection(event);
+//
+//        player.play(query);
     }
 
     @NotNull
