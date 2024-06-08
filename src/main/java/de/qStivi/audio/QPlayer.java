@@ -1,9 +1,6 @@
 package de.qStivi.audio;
 
 import com.google.api.services.youtube.model.SearchResult;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import de.qStivi.NoResultsException;
 import de.qStivi.apis.YouTubeAPI;
 import net.dv8tion.jda.api.entities.Guild;

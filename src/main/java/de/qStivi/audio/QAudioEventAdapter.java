@@ -125,17 +125,17 @@ public class QAudioEventAdapter extends AudioEventAdapter {
     void queue(AudioTrack track) {
         var trackInfo = track.getInfo().title + " (" + track.getIdentifier() + ")";
         if (player.getPlayingTrack() != null) {
-//            LOGGER.info("queue() - Queueing track: " + trackInfo);
+            LOGGER.info("queue() - Queueing track: " + trackInfo);
             if (queue.offer(track)) {
-//                LOGGER.info("queue() - Successfully queued track: " + trackInfo);
+                LOGGER.info("queue() - Successfully queued track: " + trackInfo);
             } else {
-//                LOGGER.error("queue() - Error while queueing track: " + trackInfo);
+                LOGGER.error("queue() - Error while queueing track: " + trackInfo);
             }
         } else {
-//            LOGGER.info("queue() - Playing track: " + trackInfo);
+            LOGGER.info("queue() - Playing track: " + trackInfo);
             player.playTrack(track);
         }
-//        queue.forEach(audioTrack -> LOGGER.info(audioTrack.getIdentifier()));
+        queue.forEach(audioTrack -> LOGGER.info(audioTrack.getIdentifier()));
     }
 
     Queue<AudioTrack> getQueue() {

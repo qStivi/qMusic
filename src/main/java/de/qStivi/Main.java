@@ -3,6 +3,9 @@ package de.qStivi;
 import de.qStivi.commands.CommandHandler;
 import de.qStivi.commands.ICommand;
 import de.qStivi.listener.ControlsManager;
+import dev.arbjerg.lavalink.client.Helpers;
+import dev.arbjerg.lavalink.client.LavalinkClient;
+import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -32,11 +35,17 @@ public class Main extends ListenerAdapter {
 
     public static void main(String[] args) {
 
+        String botToken = System.getenv(Properties.DISCORD);
+        LavalinkClient client = new LavalinkClient(
+                Helpers.getUserIdFromToken(botToken)
+        );
+
         JDA = JDABuilder.createLight(Properties.DISCORD)
                 .addEventListeners(new ControlsManager(), new CommandHandler())
                 .setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
                 .enableCache(CacheFlag.VOICE_STATE)
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)
+                .setVoiceDispatchInterceptor(new JDAVoiceUpdateListener(client))
                 .setActivity(Activity.playing("/help")).build();
 
         CommandHandler.updateCommands();
