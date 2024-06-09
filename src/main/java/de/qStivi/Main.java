@@ -35,7 +35,7 @@ import java.util.Optional;
 // TODO what happens when the bot is added to a guild while its running?
 public class Main extends ListenerAdapter {
 
-    public static final LavalinkClient LAVALINK = new LavalinkClient(Helpers.getUserIdFromToken(Properties.DISCORD));;
+    public static final LavalinkClient LAVALINK = new LavalinkClient(Helpers.getUserIdFromToken(Properties.DISCORD));
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static JDA JDA;
