@@ -46,7 +46,6 @@ public class TrackScheduler {
     }
 
     public void onTrackStart(Track track) {
-        // Your homework: Send a message to the channel somehow, have fun!
         System.out.println("Track started: " + track.getInfo().getTitle());
     }
 
