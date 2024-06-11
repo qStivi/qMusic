@@ -56,7 +56,7 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
             joinHelper(event);
         }
 
-        Main.LAVALINK.getOrCreateLink(event.getGuild().getIdLong()).loadItem(query).subscribe(new AudioLoader(event, GuildMusicManager.getInstance(guild.getIdLong(), Main.LAVALINK)));
+        Main.LAVALINK.getOrCreateLink(event.getGuild().getIdLong()).loadItem(query).subscribe(new AudioLoader(event, GuildMusicManager.getInstance(guild.getIdLong())));
 
 
 
@@ -74,7 +74,7 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
         }
 
-        GuildMusicManager.getInstance(event.getGuild().getIdLong(), Main.LAVALINK);
+        GuildMusicManager.getInstance(event.getGuild().getIdLong());
 
         event.getHook().editOriginal("Joining your channel!").queue();
     }

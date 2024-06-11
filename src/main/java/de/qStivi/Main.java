@@ -42,7 +42,7 @@ public class Main extends ListenerAdapter {
     private static void registerLavalinkNodes(LavalinkClient client) {
 
         // Create Lavalink node providing the name, server uri and password
-        var lavalinkNode = new NodeOptions.Builder().setName("Node 1").setServerUri("http://qstivi.ipv64.net:2333").setPassword("youshallnotpass").build();
+        var lavalinkNode = new NodeOptions.Builder().setName("Node 1").setServerUri("http://192.168.137.150:2333").setPassword("youshallnotpass").build();
 
         // Add the node to the client
         client.addNode(lavalinkNode);
@@ -60,10 +60,10 @@ public class Main extends ListenerAdapter {
         client.on(StatsEvent.class).subscribe((event) -> LOGGER.info("Node '{}' has stats, current players: {}/{} (link count {})", event.getNode().getName(), event.getPlayingPlayers(), event.getPlayers(), client.getLinks().size()));
 
         // Subscribe to the TrackStartEvent to handle the track start
-        client.on(TrackStartEvent.class).subscribe((event) -> GuildMusicManager.getInstance(event.getGuildId(), LAVALINK).scheduler.onTrackStart(event.getTrack()));
+        client.on(TrackStartEvent.class).subscribe((event) -> GuildMusicManager.getInstance(event.getGuildId()).scheduler.onTrackStart(event.getTrack()));
 
         // Subscribe to the TrackEndEvent to handle the track end
-        client.on(TrackEndEvent.class).subscribe((event) -> GuildMusicManager.getInstance(event.getGuildId(), LAVALINK).scheduler.onTrackEnd(event.getTrack(), event.getEndReason()));
+        client.on(TrackEndEvent.class).subscribe((event) -> GuildMusicManager.getInstance(event.getGuildId()).scheduler.onTrackEnd(event.getTrack(), event.getEndReason()));
 
         // Subscribe to the EmittedEvent to log all events
         client.on(EmittedEvent.class).subscribe((event) -> {

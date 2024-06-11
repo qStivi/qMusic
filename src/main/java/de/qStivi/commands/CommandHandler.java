@@ -25,7 +25,7 @@ public class CommandHandler extends ListenerAdapter {
 
     static {
         LOGGER.info("Registering commands.");
-        registerSlashCommands(new PlaySlashCommand(), new PlayYoutubeSlashCommand());
+        registerSlashCommands(new PlaySlashCommand(), new PlayYoutubeSlashCommand(), new PauseCommand(), new SkipCommand(), new ContinueCommand(), new StopCommand());
         registerUserContextCommands(new ShutdownUserContextCommand());
     }
 
@@ -42,6 +42,7 @@ public class CommandHandler extends ListenerAdapter {
 
     /**
      * Registers the given commands.
+     *
      * @param commands The commands to register.
      */
     private static void registerSlashCommands(ICommand<SlashCommandInteractionEvent>... commands) {
@@ -50,6 +51,7 @@ public class CommandHandler extends ListenerAdapter {
 
     /**
      * Registers the given commands.
+     *
      * @param commands The commands to register.
      */
     private static void registerUserContextCommands(ICommand<UserContextInteractionEvent>... commands) {
