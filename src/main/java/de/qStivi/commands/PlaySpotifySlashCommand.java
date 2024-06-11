@@ -1,8 +1,6 @@
 package de.qStivi.commands;
 
 import de.qStivi.NoResultsException;
-import de.qStivi.apis.SpotifyAPI;
-import de.qStivi.apis.YouTubeAPI;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -10,12 +8,8 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteractionEvent> {
 

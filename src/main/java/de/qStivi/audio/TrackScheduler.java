@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Queue;
 
 public class TrackScheduler {
-    private final GuildMusicManager guildMusicManager;
     public final Queue<Track> queue = new LinkedList<>();
+    private final GuildMusicManager guildMusicManager;
 
     public TrackScheduler(GuildMusicManager guildMusicManager) {
         this.guildMusicManager = guildMusicManager;

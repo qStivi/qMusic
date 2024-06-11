@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Optional;
 
 public class GuildMusicManager {
+    private static final Map<Long, GuildMusicManager> INSTANCE_MAP = new HashMap<>();
     public final TrackScheduler scheduler = new TrackScheduler(this);
     private final long guildId;
 
-
-    private static final Map<Long, GuildMusicManager> INSTANCE_MAP = new HashMap<>();
+    private GuildMusicManager(long guildId) {
+        this.guildId = guildId;
+    }
 
     public static GuildMusicManager getInstance(Long guildID) {
         if (INSTANCE_MAP.containsKey(guildID)) {
@@ -23,10 +25,6 @@ public class GuildMusicManager {
             INSTANCE_MAP.put(guildID, instance);
             return instance;
         }
-    }
-
-    private GuildMusicManager(long guildId) {
-        this.guildId = guildId;
     }
 
     public void stop() {

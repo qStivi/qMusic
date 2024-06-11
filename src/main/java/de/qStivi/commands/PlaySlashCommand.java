@@ -59,7 +59,6 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
         Main.LAVALINK.getOrCreateLink(event.getGuild().getIdLong()).loadItem(query).subscribe(new AudioLoader(event, GuildMusicManager.getInstance(guild.getIdLong())));
 
 
-
 //        player.openAudioConnection(event);
 //
 //        player.playQuery(query);
