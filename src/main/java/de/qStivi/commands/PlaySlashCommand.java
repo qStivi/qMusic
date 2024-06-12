@@ -1,6 +1,7 @@
 package de.qStivi.commands;
 
 import de.qStivi.ChatMessage;
+import de.qStivi.Lavalink;
 import de.qStivi.Main;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.audio.GuildMusicManager;
@@ -48,7 +49,10 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
 
         joinHelper(event, message);
 
-        Main.LAVALINK.getOrCreateLink(guild.getIdLong()).loadItem(query).subscribe(new AudioLoader(GuildMusicManager.getInstance(guild.getIdLong()), message, false));
+        var al = AudioLoader.getInstance(guild.getIdLong());
+        al.setMessage(message);
+
+        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
 
     }
 
@@ -66,9 +70,7 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
 
         if (memberVoiceState.inAudioChannel()) {
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
-        }
-
-        GuildMusicManager.getInstance(event.getGuild().getIdLong());
+        };
 
         message.edit("Joining your channel!");
     }

@@ -1,6 +1,7 @@
 package de.qStivi.commands;
 
 import de.qStivi.ChatMessage;
+import de.qStivi.audio.AudioLoader;
 import de.qStivi.audio.GuildMusicManager;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -23,7 +24,7 @@ public class PauseSlashCommand implements ICommand<SlashCommandInteractionEvent>
     public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
         event.getHook().editOriginal("Pausing...").complete();
 
-        GuildMusicManager.getInstance(event.getGuild().getIdLong()).pause();
+        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.pause();
     }
 
     @NotNull

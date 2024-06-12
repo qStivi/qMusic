@@ -6,27 +6,52 @@ import dev.arbjerg.lavalink.client.player.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class AudioLoader extends AbstractAudioLoadResultHandler {
-    private final GuildMusicManager mngr;
-    private final ChatMessage message;
-    private final boolean shouldSkipQueue;
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AudioLoader.class);
+    private static final HashMap<Long, AudioLoader> INSTANCE_MAP = new HashMap<>();
+    public final GuildMusicManager mngr;
+    private final Long guildID;
+    private final boolean shouldSkipQueue;
+    private ChatMessage message;
 
-    public AudioLoader(GuildMusicManager mngr, ChatMessage message, boolean shouldSkipQueue) {
-        this.mngr = mngr;
-        this.message = message;
+    private AudioLoader(Long guildID, boolean shouldSkipQueue) {
         this.shouldSkipQueue = shouldSkipQueue;
+        this.mngr = new GuildMusicManager(guildID);
+        this.guildID = guildID;
+
         LOGGER.info("New AudioLoader initialized.");
     }
 
-    public AudioLoader(GuildMusicManager mngr, ChatMessage message) {
-        this.mngr = mngr;
-        this.message = message;
+    private AudioLoader(Long guildID) {
         this.shouldSkipQueue = false;
+        this.mngr = new GuildMusicManager(guildID);
+        this.guildID = guildID;
         LOGGER.info("New AudioLoader initialized.");
     }
+
+    public static AudioLoader getInstance(Long guildID, boolean shouldSkipQueue) {
+        if (INSTANCE_MAP.containsKey(guildID)) {
+            return INSTANCE_MAP.get(guildID);
+        } else {
+            var instance = new AudioLoader(guildID, shouldSkipQueue);
+            INSTANCE_MAP.put(guildID, instance);
+            return instance;
+        }
+    }
+
+    public static AudioLoader getInstance(Long guildID) {
+        if (INSTANCE_MAP.containsKey(guildID)) {
+            return INSTANCE_MAP.get(guildID);
+        } else {
+            var instance = new AudioLoader(guildID);
+            INSTANCE_MAP.put(guildID, instance);
+            return instance;
+        }
+    }
+
 
     @Override
     public void ontrackLoaded(@NotNull TrackLoaded result) {
@@ -34,8 +59,6 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
         this.mngr.scheduler.enqueue(track, this.shouldSkipQueue);
         LOGGER.info("Track loaded and enqueued: {}", track.getInfo().getTitle());
     }
-
-
 
     @Override
     public void onPlaylistLoaded(@NotNull PlaylistLoaded result) {
@@ -70,5 +93,9 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     public void loadFailed(@NotNull LoadFailed result) {
         LOGGER.error("Failed to load track: {}", result.getException().getMessage());
         message.edit(result.getException().getMessage());
+    }
+
+    public void setMessage(ChatMessage message) {
+        this.message = message;
     }
 }

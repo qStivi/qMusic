@@ -1,6 +1,7 @@
 package de.qStivi.commands;
 
 import de.qStivi.ChatMessage;
+import de.qStivi.audio.AudioLoader;
 import de.qStivi.audio.GuildMusicManager;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -21,7 +22,7 @@ public class LoopSlashCommand implements ICommand<SlashCommandInteractionEvent> 
 
     @Override
     public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
-        var isLooping = GuildMusicManager.getInstance(event.getGuild().getIdLong()).scheduler.loop;
+        var isLooping = AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.scheduler.loop;
 
         if (isLooping) {
             message.edit("Looping disabled.");
@@ -29,7 +30,7 @@ public class LoopSlashCommand implements ICommand<SlashCommandInteractionEvent> 
             message.edit("Looping enabled.");
         }
 
-        GuildMusicManager.getInstance(event.getGuild().getIdLong()).loop();
+        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.loop();
     }
 
     @NotNull

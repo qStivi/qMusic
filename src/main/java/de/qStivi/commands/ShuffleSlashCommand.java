@@ -2,6 +2,7 @@ package de.qStivi.commands;
 
 import de.qStivi.ChatMessage;
 import de.qStivi.NoResultsException;
+import de.qStivi.audio.AudioLoader;
 import de.qStivi.audio.GuildMusicManager;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -26,7 +27,7 @@ public class ShuffleSlashCommand implements ICommand<SlashCommandInteractionEven
 
     @Override
     public void handle(SlashCommandInteractionEvent event, ChatMessage message) throws NoResultsException, IOException {
-        var guildMusicManager = GuildMusicManager.getInstance(event.getGuild().getIdLong());
+        var guildMusicManager = AudioLoader.getInstance(event.getGuild().getIdLong()).mngr;
         var scheduler = guildMusicManager.scheduler;
         var queue = scheduler.queue;
 

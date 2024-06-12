@@ -1,6 +1,7 @@
 package de.qStivi.audio;
 
 import de.qStivi.ChatMessage;
+import de.qStivi.Lavalink;
 import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.protocol.v4.Message;
 import org.slf4j.Logger;
@@ -22,26 +23,21 @@ public class TrackScheduler {
 
     public void enqueue(Track track, boolean shouldSkipQueue) {
         LOGGER.info("Enqueuing track: {}", track.getInfo().getTitle());
-        this.guildMusicManager.getPlayer().ifPresentOrElse(
-                (player) -> {
-                    if (player.getTrack() == null) {
-                        this.startTrack(track);
-                    } else {
-                        // If shouldSkipQueue is true, add the track to the front of the queue
-                        if (shouldSkipQueue) {
-                            var queueCopy = new LinkedList<>(this.queue);
-                            this.queue.clear();
-                            this.queue.offer(track);
-                            this.queue.addAll(queueCopy);
-                            return;
-                        }
-                        this.queue.offer(track);
-                    }
-                },
-                () -> {
-                    this.startTrack(track);
-                }
-        );
+
+        if (Lavalink.get(guildMusicManager.guildId).getCachedPlayer().getTrack() == null) {
+            this.startTrack(track);
+        } else {
+            // If shouldSkipQueue is true, add the track to the front of the queue
+            if (shouldSkipQueue) {
+                var queueCopy = new LinkedList<>(this.queue);
+                this.queue.clear();
+                this.queue.offer(track);
+                this.queue.addAll(queueCopy);
+                return;
+            }
+            this.queue.offer(track);
+        }
+
         LOGGER.info("Track enqueued: {}", track.getInfo().getTitle());
     }
 
@@ -49,16 +45,10 @@ public class TrackScheduler {
         LOGGER.info("Enqueuing playlist with {} tracks.", tracks.size());
         this.queue.addAll(tracks);
 
-        this.guildMusicManager.getPlayer().ifPresentOrElse(
-                (player) -> {
-                    if (player.getTrack() == null) {
-                        this.startTrack(this.queue.poll());
-                    }
-                },
-                () -> {
-                    this.startTrack(this.queue.poll());
-                }
-        );
+        if (Lavalink.get(guildMusicManager.guildId).getCachedPlayer().getTrack() == null) {
+            this.startTrack(this.queue.poll());
+        }
+
         LOGGER.info("Playlist enqueued.");
     }
 
@@ -94,12 +84,12 @@ public class TrackScheduler {
 
     private void startTrack(Track track) {
         LOGGER.info("Starting track: {}", track.getInfo().getTitle());
-        this.guildMusicManager.getLink().ifPresent(
-                (link) -> link.createOrUpdatePlayer()
+
+        Lavalink.get(guildMusicManager.guildId).createOrUpdatePlayer()
                         .setTrack(track)
                         .setVolume(35)
-                        .subscribe()
-        );
+                        .subscribe();
+
         LOGGER.info("Track started: {}", track.getInfo().getTitle());
     }
 }

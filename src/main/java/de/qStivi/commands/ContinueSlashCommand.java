@@ -1,6 +1,7 @@
 package de.qStivi.commands;
 
 import de.qStivi.ChatMessage;
+import de.qStivi.audio.AudioLoader;
 import de.qStivi.audio.GuildMusicManager;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -23,7 +24,7 @@ public class ContinueSlashCommand implements ICommand<SlashCommandInteractionEve
     public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
         event.getHook().editOriginal("Continuing...").complete();
 
-        GuildMusicManager.getInstance(event.getGuild().getIdLong()).continuePlaying();
+        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.continuePlaying();
     }
 
     @NotNull
