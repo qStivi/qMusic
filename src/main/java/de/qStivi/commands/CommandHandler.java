@@ -1,7 +1,10 @@
 package de.qStivi.commands;
 
+import de.qStivi.ChatMessage;
 import de.qStivi.Main;
 import de.qStivi.NoResultsException;
+import de.qStivi.commands.context.Shutdown;
+import de.qStivi.commands.slash.*;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
@@ -25,8 +28,8 @@ public class CommandHandler extends ListenerAdapter {
 
     static {
         LOGGER.info("Registering commands.");
-        registerSlashCommands(new PlaySlashCommand(), new PlayYoutubeSlashCommand());
-        registerUserContextCommands(new ShutdownUserContextCommand());
+        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Continue(), new Stop(), new Loop(), new Shuffle(), new First());
+        registerUserContextCommands(new Shutdown());
     }
 
     public static void updateCommands() {
@@ -42,6 +45,7 @@ public class CommandHandler extends ListenerAdapter {
 
     /**
      * Registers the given commands.
+     *
      * @param commands The commands to register.
      */
     private static void registerSlashCommands(ICommand<SlashCommandInteractionEvent>... commands) {
@@ -50,6 +54,7 @@ public class CommandHandler extends ListenerAdapter {
 
     /**
      * Registers the given commands.
+     *
      * @param commands The commands to register.
      */
     private static void registerUserContextCommands(ICommand<UserContextInteractionEvent>... commands) {
@@ -58,26 +63,37 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onGenericCommandInteraction(@NotNull GenericCommandInteractionEvent event) {
+        // Slash commands
         for (var command : SLASH_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-                event.deferReply().complete();
+
+                if (ChatMessage.getInstance() != null) {
+                    event.deferReply().complete().deleteOriginal().complete();
+                } else {
+                    var hook = event.deferReply().complete();
+                    ChatMessage.getInstance(hook);
+                }
+
+
+
                 new Thread(() -> {
                     try {
                         command.handle((SlashCommandInteractionEvent) event);
                     } catch (NoResultsException | IOException e) {
                         LOGGER.error(e.getMessage());
-                        event.getHook().editOriginal(e.getMessage()).queue();
+                        ChatMessage.getInstance(event.getHook(), false).setMessage(e.getMessage());
                     }
                 }).start();
             }
         }
 
+        // User context commands
         for (var command : USER_CONTEXT_INTERACTION_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
                 try {
                     command.handle((UserContextInteractionEvent) event);
                 } catch (NoResultsException | IOException e) {
-                    event.reply(e.getMessage()).queue();
+                    ChatMessage.getInstance(event.getHook(), true).setMessage(e.getMessage());
                 }
             }
         }

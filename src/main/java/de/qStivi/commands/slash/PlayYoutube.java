@@ -1,6 +1,6 @@
-package de.qStivi.commands;
+package de.qStivi.commands.slash;
 
-import de.qStivi.audio.QPlayer;
+import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -9,11 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
+public class PlayYoutube implements ICommand<SlashCommandInteractionEvent> {
 
-public class PlayYoutubeSlashCommand implements ICommand<SlashCommandInteractionEvent> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlayYoutubeSlashCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlayYoutube.class);
 
     private static final String QUERY = "query";
     private static final String RANDOM = "random";
@@ -28,25 +26,25 @@ public class PlayYoutubeSlashCommand implements ICommand<SlashCommandInteraction
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        event.getHook().editOriginal("Loading...").complete();
-
-        var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
-        var randomOption = event.getOption(RANDOM);
-        var guild = event.getGuild();
-
-        var random = false;
-
-        if (randomOption != null) {
-            random = randomOption.getAsBoolean();
-        }
-
-        var player = QPlayer.getInstance(guild);
-
-        player.setMessage(event.getHook().retrieveOriginal().complete());
-
-        player.openAudioConnection(event);
-
-        player.play(query);
+//        event.getHook().editOriginal("Loading...").complete();
+//
+//        var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
+//        var randomOption = event.getOption(RANDOM);
+//        var guild = event.getGuild();
+//
+//        var random = false;
+//
+//        if (randomOption != null) {
+//            random = randomOption.getAsBoolean();
+//        }
+//
+//        var player = QPlayer.getInstance(guild);
+//
+//        player.setMessage(event.getHook().retrieveOriginal().complete());
+//
+//        player.openAudioConnection(event);
+//
+//        player.play(query);
     }
 
     @NotNull
