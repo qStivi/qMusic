@@ -24,7 +24,7 @@ public class TrackScheduler {
     public void enqueue(Track track, boolean shouldSkipQueue) {
         LOGGER.info("Enqueuing track: {}", track.getInfo().getTitle());
 
-        if (Lavalink.get(guildMusicManager.guildId).getCachedPlayer().getTrack() == null) {
+        if (Lavalink.getCachedPlayer(guildMusicManager.guildId).getTrack() == null) {
             this.startTrack(track);
         } else {
             // If shouldSkipQueue is true, add the track to the front of the queue
@@ -33,9 +33,11 @@ public class TrackScheduler {
                 this.queue.clear();
                 this.queue.offer(track);
                 this.queue.addAll(queueCopy);
+                AudioLoader.getInstance(guildMusicManager.guildId).shouldSkipQueue(false);
                 return;
             }
             this.queue.offer(track);
+            LOGGER.info("Added track to top of queue: {}", track.getInfo().getTitle());
         }
 
         LOGGER.info("Track enqueued: {}", track.getInfo().getTitle());
@@ -54,7 +56,7 @@ public class TrackScheduler {
 
     public void onTrackStart(Track track) {
         LOGGER.info("Track started: {}", track.getInfo().getTitle());
-        ChatMessage.getInstance().setMessage(track.getInfo().getUri());
+        ChatMessage.getInstance().edit(track.getInfo().getUri());
     }
 
     public void onTrackEnd(Track lastTrack, Message.EmittedEvent.TrackEndEvent.AudioTrackEndReason endReason) {
@@ -78,6 +80,7 @@ public class TrackScheduler {
                 this.startTrack(nextTrack);
             } else {
                 LOGGER.info("No more tracks in queue.");
+                ChatMessage.getInstance().delete();
             }
         }
     }

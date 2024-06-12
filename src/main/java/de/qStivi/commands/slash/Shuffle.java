@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 public class Shuffle implements ICommand<SlashCommandInteractionEvent> {
 
@@ -27,12 +28,13 @@ public class Shuffle implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
+        event.deferReply().complete();
         var guildMusicManager = AudioLoader.getInstance(event.getGuild().getIdLong()).mngr;
         var scheduler = guildMusicManager.scheduler;
         var queue = scheduler.queue;
 
         if (queue.isEmpty()) {
-            ChatMessage.getInstance(event.getHook()).setMessage("Queue is empty.");
+            ChatMessage.getInstance(event.getHook()).edit("Queue is empty.");
             return;
         }
 
@@ -42,7 +44,7 @@ public class Shuffle implements ICommand<SlashCommandInteractionEvent> {
         queue.clear();
         queue.addAll(queueCopy);
 
-        ChatMessage.getInstance(event.getHook()).setMessage("Queue shuffled.");
+        event.getHook().editOriginal("Queue shuffled.").queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
     }
 
     @NotNull

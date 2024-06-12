@@ -1,12 +1,18 @@
 package de.qStivi.commands.context;
 
+import de.qStivi.ChatMessage;
+import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
+import de.qStivi.commands.slash.Stop;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 public class Shutdown implements ICommand<UserContextInteractionEvent> {
 
@@ -20,8 +26,11 @@ public class Shutdown implements ICommand<UserContextInteractionEvent> {
 
     @Override
     public void handle(UserContextInteractionEvent event) {
+        event.reply("Shutting down...").setEphemeral(true).complete();
+        event.getInteraction().getHook().deleteOriginal().complete();
         if (event.getJDA().getSelfUser().getId().equals(event.getTarget().getId()) && event.getUser().getId().equals("219108246143631364")) {
-            event.getHook().editOriginal("Shutting down...").complete();
+            AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.stop();
+            ChatMessage.getInstance().delete();
             event.getJDA().shutdown();
         }
     }

@@ -58,7 +58,7 @@ public class Lavalink {
                 var position = link.getCachedPlayer().getPosition();
                 var duration = trackInfo.getLength();
                 var progressBar = generateProgressBar(position, duration);
-                ChatMessage.getInstance().setMessage(progressBar + "\n" + trackInfo.getUri());
+                ChatMessage.getInstance().edit(progressBar + "\n" + trackInfo.getUri());
             });
         });
 

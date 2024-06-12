@@ -1,5 +1,6 @@
 package de.qStivi.audio;
 
+import de.qStivi.ChatMessage;
 import de.qStivi.Lavalink;
 import de.qStivi.Main;
 import dev.arbjerg.lavalink.client.Link;
@@ -50,7 +51,11 @@ public class GuildMusicManager {
 
     public void skip() {
         LOGGER.info("Skipping...");
-        Lavalink.getCachedPlayer(guildId).setTrack(this.scheduler.queue.poll()).subscribe();
+        var track = this.scheduler.queue.poll();
+        if (track == null) {
+            ChatMessage.getInstance().delete();
+        }
+        Lavalink.getCachedPlayer(guildId).setTrack(track).subscribe();
         LOGGER.info("Skipped.");
     }
 

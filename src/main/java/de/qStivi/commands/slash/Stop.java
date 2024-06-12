@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 public class Stop implements ICommand<SlashCommandInteractionEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Stop.class);
@@ -22,9 +24,13 @@ public class Stop implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        ChatMessage.getInstance(event.getHook()).setMessage("Stopping...");
+        event.deferReply().complete();
 
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.stop();
+
+        event.getHook().editOriginal("Stopped playback.").queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
+
+        LOGGER.info("Stopped playback.");
     }
 
     @NotNull

@@ -32,9 +32,8 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        ChatMessage.getInstance(event.getHook()).setMessage("Handling play command...");
+        event.deferReply().complete();
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
-        var random = event.getOption(RANDOM) != null && event.getOption(RANDOM).getAsBoolean();
 
         // Try parsing as URL and prepend "ytsearch:" if it fails
         try {
@@ -51,7 +50,7 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
 
         Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
 
-        ChatMessage.getInstance(event.getHook()).setMessage("Loading your song!");
+        ChatMessage.getInstance(event.getHook()).edit("Loading your song!");
 
     }
 
@@ -71,7 +70,7 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
         }
 
-        ChatMessage.getInstance(event.getHook()).setMessage("Joining your channel!");
+        ChatMessage.getInstance(event.getHook()).edit("Joining your channel!");
     }
 
     @NotNull

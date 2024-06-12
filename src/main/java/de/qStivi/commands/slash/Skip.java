@@ -22,9 +22,11 @@ public class Skip implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        ChatMessage.getInstance(event.getHook()).setMessage("Skipping...");
+        event.deferReply().complete();
 
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.skip();
+
+        ChatMessage.getInstance(event.getHook()).edit("Skipped.");
     }
 
     @NotNull

@@ -22,9 +22,11 @@ public class Pause implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        ChatMessage.getInstance(event.getHook()).setMessage("Pausing...");
+        event.deferReply().complete();
 
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.pause();
+
+        ChatMessage.getInstance(event.getHook()).edit("Paused.");
     }
 
     @NotNull

@@ -33,10 +33,18 @@ public class ChatMessage {
         return instance;
     }
 
-    public void setMessage(String message) {
+    public void edit(String message) {
         if (instance == null) {
             throw new IllegalStateException("Instance is null.");
         }
         interactionHook.editOriginal(message).complete();
+    }
+
+    public void delete() {
+        if (instance == null) {
+            throw new IllegalStateException("Instance is null.");
+        }
+        interactionHook.deleteOriginal().complete();
+        instance = null;
     }
 }

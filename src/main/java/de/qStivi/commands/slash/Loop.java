@@ -22,12 +22,13 @@ public class Loop implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
+        event.deferReply().complete();
         var isLooping = AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.scheduler.loop;
 
         if (isLooping) {
-            ChatMessage.getInstance(event.getHook()).setMessage("Looping disabled.");
+            ChatMessage.getInstance(event.getHook()).edit("Looping disabled.");
         } else {
-            ChatMessage.getInstance(event.getHook()).setMessage("Looping enabled.");
+            ChatMessage.getInstance(event.getHook()).edit("Looping enabled.");
         }
 
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.loop();

@@ -22,8 +22,9 @@ public class Continue implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
+        event.deferReply().complete();
         LOGGER.info("Handling continue command...");
-        ChatMessage.getInstance(event.getHook()).setMessage("Continuing...");
+        ChatMessage.getInstance(event.getHook()).edit("Continuing...");
 
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.continuePlaying();
     }

@@ -28,7 +28,7 @@ public class CommandHandler extends ListenerAdapter {
 
     static {
         LOGGER.info("Registering commands.");
-        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Continue(), new Stop(), new Loop(), new Shuffle(), new First());
+        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Continue(), new Stop(), new Loop(), new Shuffle(), new First(), new GetQueue());
         registerUserContextCommands(new Shutdown());
     }
 
@@ -66,22 +66,12 @@ public class CommandHandler extends ListenerAdapter {
         // Slash commands
         for (var command : SLASH_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-
-                if (ChatMessage.getInstance() != null) {
-                    event.deferReply().complete().deleteOriginal().complete();
-                } else {
-                    var hook = event.deferReply().complete();
-                    ChatMessage.getInstance(hook);
-                }
-
-
-
                 new Thread(() -> {
                     try {
                         command.handle((SlashCommandInteractionEvent) event);
                     } catch (NoResultsException | IOException e) {
                         LOGGER.error(e.getMessage());
-                        ChatMessage.getInstance(event.getHook(), false).setMessage(e.getMessage());
+                        ChatMessage.getInstance(event.getHook(), false).edit(e.getMessage());
                     }
                 }).start();
             }
@@ -93,7 +83,7 @@ public class CommandHandler extends ListenerAdapter {
                 try {
                     command.handle((UserContextInteractionEvent) event);
                 } catch (NoResultsException | IOException e) {
-                    ChatMessage.getInstance(event.getHook(), true).setMessage(e.getMessage());
+                    ChatMessage.getInstance(event.getHook(), true).edit(e.getMessage());
                 }
             }
         }

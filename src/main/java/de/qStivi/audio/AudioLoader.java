@@ -14,31 +14,17 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     private static final HashMap<Long, AudioLoader> INSTANCE_MAP = new HashMap<>();
     public final GuildMusicManager mngr;
     private final Long guildID;
-    private final boolean shouldSkipQueue;
 
-    private AudioLoader(Long guildID, boolean shouldSkipQueue) {
+    public void shouldSkipQueue(boolean shouldSkipQueue) {
         this.shouldSkipQueue = shouldSkipQueue;
-        this.mngr = new GuildMusicManager(guildID);
-        this.guildID = guildID;
-
-        LOGGER.info("New AudioLoader initialized.");
     }
+
+    public boolean shouldSkipQueue = false;
 
     private AudioLoader(Long guildID) {
-        this.shouldSkipQueue = false;
         this.mngr = new GuildMusicManager(guildID);
         this.guildID = guildID;
         LOGGER.info("New AudioLoader initialized.");
-    }
-
-    public static AudioLoader getInstance(Long guildID, boolean shouldSkipQueue) {
-        if (INSTANCE_MAP.containsKey(guildID)) {
-            return INSTANCE_MAP.get(guildID);
-        } else {
-            var instance = new AudioLoader(guildID, shouldSkipQueue);
-            INSTANCE_MAP.put(guildID, instance);
-            return instance;
-        }
     }
 
     public static AudioLoader getInstance(Long guildID) {
@@ -85,12 +71,12 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     @Override
     public void noMatches() {
         LOGGER.info("No matches found for your input!");
-        ChatMessage.getInstance().setMessage("No matches found for your input!");
+        ChatMessage.getInstance().edit("No matches found for your input!");
     }
 
     @Override
     public void loadFailed(@NotNull LoadFailed result) {
         LOGGER.error("Failed to load track: {}", result.getException().getMessage());
-        ChatMessage.getInstance().setMessage(result.getException().getMessage());
+        ChatMessage.getInstance().edit(result.getException().getMessage());
     }
 }

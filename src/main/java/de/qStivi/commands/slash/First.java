@@ -4,6 +4,7 @@ import de.qStivi.ChatMessage;
 import de.qStivi.Lavalink;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
+import dev.arbjerg.lavalink.client.player.Track;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class First implements ICommand<SlashCommandInteractionEvent> {
 
@@ -30,6 +32,7 @@ public class First implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
+        event.deferReply().complete();
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
 
         // Try parsing as URL and prepend "ytsearch:" if it fails
@@ -43,8 +46,31 @@ public class First implements ICommand<SlashCommandInteractionEvent> {
 
         joinHelper(event);
 
-        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(AudioLoader.getInstance(guild.getIdLong(), true));
+        var al = AudioLoader.getInstance(guild.getIdLong());
+                al.shouldSkipQueue(true);
 
+        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        event.getHook().editOriginal("Added song to queue! Here are the next 10 songs in the queue.").queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
+
+        StringBuilder sb = new StringBuilder();
+
+        var i = 0;
+        for (Track audioTrack : AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.scheduler.queue) {
+            sb.append(i++).append(". ").append("`").append(audioTrack.getInfo().getTitle()).append("`").append(" by ").append("`").append(audioTrack.getInfo().getAuthor()).append("`").append("\n");
+            if (i == 10) {
+                sb.append("...");
+                break;
+            }
+        }
+
+        event.getChannel().sendMessage(sb.toString()).queue((msg) -> msg.delete().queueAfter(15, TimeUnit.MINUTES));
     }
 
     // Makes sure that the bot is in a voice channel!
@@ -63,7 +89,7 @@ public class First implements ICommand<SlashCommandInteractionEvent> {
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
         }
 
-        ChatMessage.getInstance(event.getHook()).setMessage("Joining your channel!");
+        ChatMessage.getInstance(event.getHook()).edit("Joining your channel!");
     }
 
     @NotNull
