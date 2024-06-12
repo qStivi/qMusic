@@ -1,5 +1,6 @@
 package de.qStivi.audio;
 
+import de.qStivi.ChatMessage;
 import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.protocol.v4.Message;
 import org.slf4j.Logger;
@@ -63,7 +64,7 @@ public class TrackScheduler {
 
     public void onTrackStart(Track track) {
         LOGGER.info("Track started: {}", track.getInfo().getTitle());
-
+        ChatMessage.getInstance().edit("Now playing: " + track.getInfo().getUri());
     }
 
     public void onTrackEnd(Track lastTrack, Message.EmittedEvent.TrackEndEvent.AudioTrackEndReason endReason) {

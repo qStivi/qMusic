@@ -65,7 +65,7 @@ public class CommandHandler extends ListenerAdapter {
         for (var command : SLASH_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
                 var interactionHook = event.deferReply().complete();
-                var message = new ChatMessage(interactionHook);
+                var message = ChatMessage.getInstance(interactionHook);
                 new Thread(() -> {
                     try {
                         command.handle((SlashCommandInteractionEvent) event, message);
@@ -82,7 +82,7 @@ public class CommandHandler extends ListenerAdapter {
             if (command.getCommand().getName().equals(event.getName())) {
                 try {
                     var interactionHook = event.deferReply().complete();
-                    var message = new ChatMessage(interactionHook);
+                    var message = ChatMessage.getInstance(interactionHook);
                     command.handle((UserContextInteractionEvent) event, message);
                 } catch (NoResultsException | IOException e) {
                     event.reply(e.getMessage()).queue();
