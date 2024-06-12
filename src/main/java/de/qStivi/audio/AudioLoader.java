@@ -11,18 +11,27 @@ import java.util.List;
 public class AudioLoader extends AbstractAudioLoadResultHandler {
     private final GuildMusicManager mngr;
     private final ChatMessage message;
+    private final boolean shouldSkipQueue;
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AudioLoader.class);
+
+    public AudioLoader(GuildMusicManager mngr, ChatMessage message, boolean shouldSkipQueue) {
+        this.mngr = mngr;
+        this.message = message;
+        this.shouldSkipQueue = shouldSkipQueue;
+        LOGGER.info("New AudioLoader initialized.");
+    }
 
     public AudioLoader(GuildMusicManager mngr, ChatMessage message) {
         this.mngr = mngr;
         this.message = message;
+        this.shouldSkipQueue = false;
         LOGGER.info("New AudioLoader initialized.");
     }
 
     @Override
     public void ontrackLoaded(@NotNull TrackLoaded result) {
         final Track track = result.getTrack();
-        this.mngr.scheduler.enqueue(track);
+        this.mngr.scheduler.enqueue(track, this.shouldSkipQueue);
         LOGGER.info("Track loaded and enqueued: {}", track.getInfo().getTitle());
     }
 
@@ -46,7 +55,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
         final Track firstTrack = tracks.get(0);
 
-        this.mngr.scheduler.enqueue(firstTrack);
+        this.mngr.scheduler.enqueue(firstTrack, this.shouldSkipQueue);
 
         LOGGER.info("Search result loaded and enqueued: {}", firstTrack.getInfo().getTitle());
     }

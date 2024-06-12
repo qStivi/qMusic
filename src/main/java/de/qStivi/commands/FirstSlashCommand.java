@@ -16,12 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> {
+public class FirstSlashCommand implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlaySlashCommand.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(FirstSlashCommand.class);
     private static final String QUERY = "query";
-    private static final String RANDOM = "random";
 
     @NotNull
     @Override
@@ -35,7 +33,6 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
         message.edit("Loading...");
 
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
-        var random = event.getOption(RANDOM) != null && event.getOption(RANDOM).getAsBoolean();
 
         // Try parsing as URL and prepend "ytsearch:" if it fails
         try {
@@ -48,7 +45,7 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
 
         joinHelper(event, message);
 
-        Main.LAVALINK.getOrCreateLink(guild.getIdLong()).loadItem(query).subscribe(new AudioLoader(GuildMusicManager.getInstance(guild.getIdLong()), message, false));
+        Main.LAVALINK.getOrCreateLink(guild.getIdLong()).loadItem(query).subscribe(new AudioLoader(GuildMusicManager.getInstance(guild.getIdLong()), message, true));
 
     }
 
@@ -76,12 +73,12 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
     @NotNull
     @Override
     public String getName() {
-        return "play";
+        return "first";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Provide a link or search query to some video, music or playlist and I will try to play it for you.";
+        return "Puts your song in the front of the queue.";
     }
 }

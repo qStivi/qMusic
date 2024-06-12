@@ -19,13 +19,21 @@ public class TrackScheduler {
         LOGGER.info("New TrackScheduler initialized.");
     }
 
-    public void enqueue(Track track) {
+    public void enqueue(Track track, boolean shouldSkipQueue) {
         LOGGER.info("Enqueuing track: {}", track.getInfo().getTitle());
         this.guildMusicManager.getPlayer().ifPresentOrElse(
                 (player) -> {
                     if (player.getTrack() == null) {
                         this.startTrack(track);
                     } else {
+                        // If shouldSkipQueue is true, add the track to the front of the queue
+                        if (shouldSkipQueue) {
+                            var queueCopy = new LinkedList<>(this.queue);
+                            this.queue.clear();
+                            this.queue.offer(track);
+                            this.queue.addAll(queueCopy);
+                            return;
+                        }
                         this.queue.offer(track);
                     }
                 },
@@ -55,6 +63,7 @@ public class TrackScheduler {
 
     public void onTrackStart(Track track) {
         LOGGER.info("Track started: {}", track.getInfo().getTitle());
+
     }
 
     public void onTrackEnd(Track lastTrack, Message.EmittedEvent.TrackEndEvent.AudioTrackEndReason endReason) {
