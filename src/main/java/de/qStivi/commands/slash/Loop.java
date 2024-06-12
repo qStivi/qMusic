@@ -1,8 +1,8 @@
-package de.qStivi.commands;
+package de.qStivi.commands.slash;
 
 import de.qStivi.ChatMessage;
 import de.qStivi.audio.AudioLoader;
-import de.qStivi.audio.GuildMusicManager;
+import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoopSlashCommand implements ICommand<SlashCommandInteractionEvent> {
+public class Loop implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoopSlashCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Loop.class);
 
     @NotNull
     @Override
@@ -21,13 +21,13 @@ public class LoopSlashCommand implements ICommand<SlashCommandInteractionEvent> 
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
+    public void handle(SlashCommandInteractionEvent event) {
         var isLooping = AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.scheduler.loop;
 
         if (isLooping) {
-            message.edit("Looping disabled.");
+            ChatMessage.getInstance(event.getHook()).setMessage("Looping disabled.");
         } else {
-            message.edit("Looping enabled.");
+            ChatMessage.getInstance(event.getHook()).setMessage("Looping enabled.");
         }
 
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.loop();

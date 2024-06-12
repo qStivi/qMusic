@@ -1,10 +1,9 @@
-package de.qStivi.commands;
+package de.qStivi.commands.slash;
 
 import de.qStivi.ChatMessage;
 import de.qStivi.Lavalink;
-import de.qStivi.Main;
 import de.qStivi.audio.AudioLoader;
-import de.qStivi.audio.GuildMusicManager;
+import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class FirstSlashCommand implements ICommand<SlashCommandInteractionEvent> {
+public class First implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FirstSlashCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(First.class);
     private static final String QUERY = "query";
 
     @NotNull
@@ -30,9 +29,7 @@ public class FirstSlashCommand implements ICommand<SlashCommandInteractionEvent>
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
-        message.edit("Loading...");
-
+    public void handle(SlashCommandInteractionEvent event) {
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
 
         // Try parsing as URL and prepend "ytsearch:" if it fails
@@ -44,14 +41,14 @@ public class FirstSlashCommand implements ICommand<SlashCommandInteractionEvent>
 
         var guild = event.getGuild();
 
-        joinHelper(event, message);
+        joinHelper(event);
 
         Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(AudioLoader.getInstance(guild.getIdLong(), true));
 
     }
 
     // Makes sure that the bot is in a voice channel!
-    private void joinHelper(SlashCommandInteractionEvent event, ChatMessage message) {
+    private void joinHelper(SlashCommandInteractionEvent event) {
         // If the bot is already in a voice channel, return
         if (event.getGuild().getSelfMember().getVoiceState().inAudioChannel()) {
             return;
@@ -66,7 +63,7 @@ public class FirstSlashCommand implements ICommand<SlashCommandInteractionEvent>
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
         }
 
-        message.edit("Joining your channel!");
+        ChatMessage.getInstance(event.getHook()).setMessage("Joining your channel!");
     }
 
     @NotNull

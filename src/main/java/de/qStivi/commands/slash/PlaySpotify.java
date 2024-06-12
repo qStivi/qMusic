@@ -1,7 +1,7 @@
-package de.qStivi.commands;
+package de.qStivi.commands.slash;
 
-import de.qStivi.ChatMessage;
 import de.qStivi.NoResultsException;
+import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteractionEvent> {
+public class PlaySpotify implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlaySpotifySlashCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlaySpotify.class);
 
     private static final String COMMAND_NAME = "link";
 
@@ -25,7 +25,7 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event, ChatMessage message) throws NoResultsException, IOException {
+    public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
 //        var option = event.getOption(COMMAND_NAME);
 //        var guild = event.getGuild();
 //        if (option == null) {

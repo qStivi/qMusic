@@ -45,7 +45,7 @@ public class TrackScheduler {
         LOGGER.info("Enqueuing playlist with {} tracks.", tracks.size());
         this.queue.addAll(tracks);
 
-        if (Lavalink.get(guildMusicManager.guildId).getCachedPlayer().getTrack() == null) {
+        if (Lavalink.getCachedPlayer(guildMusicManager.guildId).getTrack() == null) {
             this.startTrack(this.queue.poll());
         }
 
@@ -54,7 +54,7 @@ public class TrackScheduler {
 
     public void onTrackStart(Track track) {
         LOGGER.info("Track started: {}", track.getInfo().getTitle());
-        ChatMessage.getInstance().edit("Now playing: " + track.getInfo().getUri());
+        ChatMessage.getInstance().setMessage(track.getInfo().getUri());
     }
 
     public void onTrackEnd(Track lastTrack, Message.EmittedEvent.TrackEndEvent.AudioTrackEndReason endReason) {

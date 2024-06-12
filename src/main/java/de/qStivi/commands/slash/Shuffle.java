@@ -1,9 +1,9 @@
-package de.qStivi.commands;
+package de.qStivi.commands.slash;
 
 import de.qStivi.ChatMessage;
 import de.qStivi.NoResultsException;
 import de.qStivi.audio.AudioLoader;
-import de.qStivi.audio.GuildMusicManager;
+import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class ShuffleSlashCommand implements ICommand<SlashCommandInteractionEvent> {
+public class Shuffle implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShuffleSlashCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Shuffle.class);
 
     @NotNull
     @Override
@@ -26,13 +26,13 @@ public class ShuffleSlashCommand implements ICommand<SlashCommandInteractionEven
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event, ChatMessage message) throws NoResultsException, IOException {
+    public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
         var guildMusicManager = AudioLoader.getInstance(event.getGuild().getIdLong()).mngr;
         var scheduler = guildMusicManager.scheduler;
         var queue = scheduler.queue;
 
         if (queue.isEmpty()) {
-            message.edit("Queue is empty.");
+            ChatMessage.getInstance(event.getHook()).setMessage("Queue is empty.");
             return;
         }
 
@@ -42,7 +42,7 @@ public class ShuffleSlashCommand implements ICommand<SlashCommandInteractionEven
         queue.clear();
         queue.addAll(queueCopy);
 
-        message.edit("Queue shuffled.");
+        ChatMessage.getInstance(event.getHook()).setMessage("Queue shuffled.");
     }
 
     @NotNull

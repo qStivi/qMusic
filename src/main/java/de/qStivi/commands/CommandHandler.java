@@ -3,6 +3,8 @@ package de.qStivi.commands;
 import de.qStivi.ChatMessage;
 import de.qStivi.Main;
 import de.qStivi.NoResultsException;
+import de.qStivi.commands.context.Shutdown;
+import de.qStivi.commands.slash.*;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
@@ -26,8 +28,8 @@ public class CommandHandler extends ListenerAdapter {
 
     static {
         LOGGER.info("Registering commands.");
-        registerSlashCommands(new PlaySlashCommand(), new PlayYoutubeSlashCommand(), new PauseSlashCommand(), new SkipSlashCommand(), new ContinueSlashCommand(), new StopSlashCommand(), new LoopSlashCommand(), new ShuffleSlashCommand(), new FirstSlashCommand());
-        registerUserContextCommands(new ShutdownUserContextCommand());
+        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Continue(), new Stop(), new Loop(), new Shuffle(), new First());
+        registerUserContextCommands(new Shutdown());
     }
 
     public static void updateCommands() {
@@ -64,14 +66,22 @@ public class CommandHandler extends ListenerAdapter {
         // Slash commands
         for (var command : SLASH_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-                var interactionHook = event.deferReply().complete();
-                var message = ChatMessage.getInstance(interactionHook);
+
+                if (ChatMessage.getInstance() != null) {
+                    event.deferReply().complete().deleteOriginal().complete();
+                } else {
+                    var hook = event.deferReply().complete();
+                    ChatMessage.getInstance(hook);
+                }
+
+
+
                 new Thread(() -> {
                     try {
-                        command.handle((SlashCommandInteractionEvent) event, message);
+                        command.handle((SlashCommandInteractionEvent) event);
                     } catch (NoResultsException | IOException e) {
                         LOGGER.error(e.getMessage());
-                        message.edit(e.getMessage());
+                        ChatMessage.getInstance(event.getHook(), false).setMessage(e.getMessage());
                     }
                 }).start();
             }
@@ -81,11 +91,9 @@ public class CommandHandler extends ListenerAdapter {
         for (var command : USER_CONTEXT_INTERACTION_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
                 try {
-                    var interactionHook = event.deferReply().complete();
-                    var message = ChatMessage.getInstance(interactionHook);
-                    command.handle((UserContextInteractionEvent) event, message);
+                    command.handle((UserContextInteractionEvent) event);
                 } catch (NoResultsException | IOException e) {
-                    event.reply(e.getMessage()).queue();
+                    ChatMessage.getInstance(event.getHook(), true).setMessage(e.getMessage());
                 }
             }
         }

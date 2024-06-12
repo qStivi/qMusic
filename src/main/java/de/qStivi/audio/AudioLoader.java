@@ -15,7 +15,6 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     public final GuildMusicManager mngr;
     private final Long guildID;
     private final boolean shouldSkipQueue;
-    private ChatMessage message;
 
     private AudioLoader(Long guildID, boolean shouldSkipQueue) {
         this.shouldSkipQueue = shouldSkipQueue;
@@ -86,16 +85,12 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     @Override
     public void noMatches() {
         LOGGER.info("No matches found for your input!");
-        message.edit("No matches found for your input!");
+        ChatMessage.getInstance().setMessage("No matches found for your input!");
     }
 
     @Override
     public void loadFailed(@NotNull LoadFailed result) {
         LOGGER.error("Failed to load track: {}", result.getException().getMessage());
-        message.edit(result.getException().getMessage());
-    }
-
-    public void setMessage(ChatMessage message) {
-        this.message = message;
+        ChatMessage.getInstance().setMessage(result.getException().getMessage());
     }
 }

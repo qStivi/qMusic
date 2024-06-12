@@ -1,8 +1,8 @@
-package de.qStivi.commands;
+package de.qStivi.commands.slash;
 
 import de.qStivi.ChatMessage;
 import de.qStivi.audio.AudioLoader;
-import de.qStivi.audio.GuildMusicManager;
+import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SkipSlashCommand implements ICommand<SlashCommandInteractionEvent> {
+public class Stop implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SkipSlashCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Stop.class);
 
     @NotNull
     @Override
@@ -21,21 +21,21 @@ public class SkipSlashCommand implements ICommand<SlashCommandInteractionEvent> 
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
-        event.getHook().editOriginal("Skipping...").complete();
+    public void handle(SlashCommandInteractionEvent event) {
+        ChatMessage.getInstance(event.getHook()).setMessage("Stopping...");
 
-        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.skip();
+        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.stop();
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "skip";
+        return "stop";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Skips the current playback.";
+        return "Stops the current playback.";
     }
 }
