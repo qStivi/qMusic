@@ -11,7 +11,7 @@ import java.util.Queue;
 public class TrackScheduler {
     public final Queue<Track> queue = new LinkedList<>();
     private final GuildMusicManager guildMusicManager;
-    boolean loop = false;
+    public boolean loop = false;
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(TrackScheduler.class);
 
     public TrackScheduler(GuildMusicManager guildMusicManager) {

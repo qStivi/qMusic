@@ -21,7 +21,13 @@ public class LoopCommand implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
-        event.getHook().editOriginal("Looping...").complete();
+        var isLooping = GuildMusicManager.getInstance(event.getGuild().getIdLong()).scheduler.loop;
+
+        if (isLooping) {
+            message.edit("Looping disabled.");
+        } else {
+            message.edit("Looping enabled.");
+        }
 
         GuildMusicManager.getInstance(event.getGuild().getIdLong()).loop();
     }
