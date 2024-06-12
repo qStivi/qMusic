@@ -1,5 +1,6 @@
 package de.qStivi.commands;
 
+import de.qStivi.ChatMessage;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -24,7 +25,7 @@ public class PlayYoutubeSlashCommand implements ICommand<SlashCommandInteraction
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event) {
+    public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
 //        event.getHook().editOriginal("Loading...").complete();
 //
 //        var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();

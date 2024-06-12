@@ -1,5 +1,6 @@
 package de.qStivi.commands;
 
+import de.qStivi.ChatMessage;
 import de.qStivi.audio.GuildMusicManager;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -19,7 +20,7 @@ public class StopCommand implements ICommand<SlashCommandInteractionEvent> {
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event) {
+    public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
         event.getHook().editOriginal("Stopping...").complete();
 
         GuildMusicManager.getInstance(event.getGuild().getIdLong()).stop();
@@ -28,7 +29,7 @@ public class StopCommand implements ICommand<SlashCommandInteractionEvent> {
     @NotNull
     @Override
     public String getName() {
-        return "Stop";
+        return "stop";
     }
 
     @NotNull

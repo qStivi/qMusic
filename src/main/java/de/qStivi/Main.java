@@ -48,16 +48,16 @@ public class Main extends ListenerAdapter {
         client.addNode(lavalinkNode);
 
         // Subscribe to the TrackStartEvent to log the track start
-        client.on(TrackStartEvent.class).subscribe((event) -> LOGGER.trace("{}: track started: {}", event.getNode().getName(), event.getTrack().getInfo()));
+        client.on(TrackStartEvent.class).subscribe((event) -> LOGGER.debug("{}: track started: {}", event.getNode().getName(), event.getTrack().getInfo()));
     }
 
     private static void registerLavalinkListeners(LavalinkClient client) {
 
         // Subscribe to the ReadyEvent to log the session id
-        client.on(ReadyEvent.class).subscribe((event) -> LOGGER.info("Node '{}' is ready, session id is '{}'!", event.getNode().getName(), event.getSessionId()));
+        client.on(ReadyEvent.class).subscribe((event) -> LOGGER.debug("Node '{}' is ready, session id is '{}'!", event.getNode().getName(), event.getSessionId()));
 
         // Subscribe to the StatsEvent to log some stats
-        client.on(StatsEvent.class).subscribe((event) -> LOGGER.info("Node '{}' has stats, current players: {}/{} (link count {})", event.getNode().getName(), event.getPlayingPlayers(), event.getPlayers(), client.getLinks().size()));
+        client.on(StatsEvent.class).subscribe((event) -> LOGGER.debug("Node '{}' has stats, current players: {}/{} (link count {})", event.getNode().getName(), event.getPlayingPlayers(), event.getPlayers(), client.getLinks().size()));
 
         // Subscribe to the TrackStartEvent to handle the track start
         client.on(TrackStartEvent.class).subscribe((event) -> GuildMusicManager.getInstance(event.getGuildId()).scheduler.onTrackStart(event.getTrack()));
@@ -68,10 +68,10 @@ public class Main extends ListenerAdapter {
         // Subscribe to the EmittedEvent to log all events
         client.on(EmittedEvent.class).subscribe((event) -> {
             if (event instanceof TrackStartEvent) {
-                LOGGER.info("Is a track start event!");
+                LOGGER.debug("Is a track start event!");
             }
 
-            LOGGER.info("Node '{}' emitted event: {}", event.getNode().getName(), event);
+            LOGGER.debug("Node '{}' emitted event: {}", event.getNode().getName(), event);
         });
     }
 }

@@ -1,5 +1,6 @@
 package de.qStivi.commands;
 
+import de.qStivi.ChatMessage;
 import de.qStivi.Main;
 import de.qStivi.NoResultsException;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
@@ -25,7 +26,7 @@ public class CommandHandler extends ListenerAdapter {
 
     static {
         LOGGER.info("Registering commands.");
-        registerSlashCommands(new PlaySlashCommand(), new PlayYoutubeSlashCommand(), new PauseCommand(), new SkipCommand(), new ContinueCommand(), new StopCommand());
+        registerSlashCommands(new PlaySlashCommand(), new PlayYoutubeSlashCommand(), new PauseCommand(), new SkipCommand(), new ContinueCommand(), new StopCommand(), new LoopCommand());
         registerUserContextCommands(new ShutdownUserContextCommand());
     }
 
@@ -60,24 +61,29 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onGenericCommandInteraction(@NotNull GenericCommandInteractionEvent event) {
+        // Slash commands
         for (var command : SLASH_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-                event.deferReply().complete();
+                var interactionHook = event.deferReply().complete();
+                var message = new ChatMessage(interactionHook);
                 new Thread(() -> {
                     try {
-                        command.handle((SlashCommandInteractionEvent) event);
+                        command.handle((SlashCommandInteractionEvent) event, message);
                     } catch (NoResultsException | IOException e) {
                         LOGGER.error(e.getMessage());
-                        event.getHook().editOriginal(e.getMessage()).queue();
+                        message.edit(e.getMessage());
                     }
                 }).start();
             }
         }
 
+        // User context commands
         for (var command : USER_CONTEXT_INTERACTION_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
                 try {
-                    command.handle((UserContextInteractionEvent) event);
+                    var interactionHook = event.deferReply().complete();
+                    var message = new ChatMessage(interactionHook);
+                    command.handle((UserContextInteractionEvent) event, message);
                 } catch (NoResultsException | IOException e) {
                     event.reply(e.getMessage()).queue();
                 }

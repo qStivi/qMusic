@@ -1,45 +1,35 @@
 package de.qStivi.audio;
 
-import de.qStivi.MyUserData;
+import de.qStivi.ChatMessage;
 import dev.arbjerg.lavalink.client.AbstractAudioLoadResultHandler;
 import dev.arbjerg.lavalink.client.player.*;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.util.List;
 
 public class AudioLoader extends AbstractAudioLoadResultHandler {
-    private final SlashCommandInteractionEvent event;
     private final GuildMusicManager mngr;
+    private final ChatMessage message;
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AudioLoader.class);
 
-    public AudioLoader(SlashCommandInteractionEvent event, GuildMusicManager mngr) {
-        this.event = event;
+    public AudioLoader(GuildMusicManager mngr, ChatMessage message) {
         this.mngr = mngr;
+        this.message = message;
+        LOGGER.info("New AudioLoader initialized.");
     }
 
     @Override
     public void ontrackLoaded(@NotNull TrackLoaded result) {
         final Track track = result.getTrack();
-
-        var userData = new MyUserData(event.getUser().getIdLong());
-
-        track.setUserData(userData);
-
         this.mngr.scheduler.enqueue(track);
-
-        final var trackTitle = track.getInfo().getTitle();
-
-        event.getHook().sendMessage("Added to queue: " + trackTitle + "\nRequested by: <@" + userData.requester() + '>').queue();
+        LOGGER.info("Track loaded and enqueued: {}", track.getInfo().getTitle());
     }
 
     @Override
     public void onPlaylistLoaded(@NotNull PlaylistLoaded result) {
-        final int trackCount = result.getTracks().size();
-        event.getHook()
-                .sendMessage("Added " + trackCount + " tracks to the queue from " + result.getInfo().getName() + "!")
-                .queue();
-
         this.mngr.scheduler.enqueuePlaylist(result.getTracks());
+        LOGGER.info("Playlist loaded and enqueued. Enqueued {} tracks.", result.getTracks().size());
     }
 
     @Override
@@ -47,24 +37,24 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
         final List<Track> tracks = result.getTracks();
 
         if (tracks.isEmpty()) {
-            event.getHook().sendMessage("No tracks found!").queue();
+            LOGGER.info("No matches found for your input!");
             return;
         }
 
         final Track firstTrack = tracks.get(0);
 
-        event.getHook().sendMessage("Adding to queue: " + firstTrack.getInfo().getTitle()).queue();
-
         this.mngr.scheduler.enqueue(firstTrack);
+
+        LOGGER.info("Search result loaded and enqueued: {}", firstTrack.getInfo().getTitle());
     }
 
     @Override
     public void noMatches() {
-        event.getHook().sendMessage("No matches found for your input!").queue();
+        LOGGER.info("No matches found for your input!");
     }
 
     @Override
     public void loadFailed(@NotNull LoadFailed result) {
-        event.getHook().sendMessage("Failed to load track! " + result.getException().getMessage()).queue();
+        LOGGER.error("Failed to load track: {}", result.getException().getMessage());
     }
 }

@@ -1,5 +1,6 @@
 package de.qStivi.commands;
 
+import de.qStivi.ChatMessage;
 import de.qStivi.NoResultsException;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -24,7 +25,7 @@ public class PlaySpotifySlashCommand implements ICommand<SlashCommandInteraction
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
+    public void handle(SlashCommandInteractionEvent event, ChatMessage message) throws NoResultsException, IOException {
 //        var option = event.getOption(COMMAND_NAME);
 //        var guild = event.getGuild();
 //        if (option == null) {

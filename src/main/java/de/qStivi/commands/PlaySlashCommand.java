@@ -1,5 +1,6 @@
 package de.qStivi.commands;
 
+import de.qStivi.ChatMessage;
 import de.qStivi.Main;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.audio.GuildMusicManager;
@@ -31,41 +32,27 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event) {
-        event.getHook().editOriginal("Loading...").complete();
+    public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
+        message.edit("Loading...");
 
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
-        var randomOption = event.getOption(RANDOM);
         var guild = event.getGuild();
 
-        var random = false;
+        joinHelper(event, message);
 
-        if (randomOption != null) {
-            random = randomOption.getAsBoolean();
-        }
+        Main.LAVALINK.getOrCreateLink(event.getGuild().getIdLong()).loadItem(query).subscribe(new AudioLoader(GuildMusicManager.getInstance(guild.getIdLong()), message));
 
-//        var player = QPlayer.getInstance(guild);
-
-//        player.setMessage(event.getHook().retrieveOriginal().complete());
-
-        // We are already connected, go ahead and play
-        if (guild.getSelfMember().getVoiceState().inAudioChannel()) {
-            event.deferReply(false).queue();
-        } else {
-            // Connect to VC first
-            joinHelper(event);
-        }
-
-        Main.LAVALINK.getOrCreateLink(event.getGuild().getIdLong()).loadItem(query).subscribe(new AudioLoader(event, GuildMusicManager.getInstance(guild.getIdLong())));
-
-
-//        player.openAudioConnection(event);
-//
-//        player.playQuery(query);
     }
 
     // Makes sure that the bot is in a voice channel!
-    private void joinHelper(SlashCommandInteractionEvent event) {
+    private void joinHelper(SlashCommandInteractionEvent event, ChatMessage message) {
+        // If the bot is already in a voice channel, return
+        if (event.getGuild().getSelfMember().getVoiceState().inAudioChannel()) {
+            return;
+        }
+
+        // Else join the voice channel of the user
+
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
@@ -75,7 +62,7 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
 
         GuildMusicManager.getInstance(event.getGuild().getIdLong());
 
-        event.getHook().editOriginal("Joining your channel!").queue();
+        message.edit("Joining your channel!");
     }
 
     @NotNull
