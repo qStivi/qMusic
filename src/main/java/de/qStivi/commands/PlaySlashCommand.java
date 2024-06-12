@@ -36,11 +36,20 @@ public class PlaySlashCommand implements ICommand<SlashCommandInteractionEvent> 
         message.edit("Loading...");
 
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
+        var random = event.getOption(RANDOM) != null && event.getOption(RANDOM).getAsBoolean();
+
+        // Try parsing as URL and prepend "ytsearch:" if it fails
+        try {
+            new java.net.URL(query);
+        } catch (java.net.MalformedURLException e) {
+            query = "ytsearch:" + query;
+        }
+
         var guild = event.getGuild();
 
         joinHelper(event, message);
 
-        Main.LAVALINK.getOrCreateLink(event.getGuild().getIdLong()).loadItem(query).subscribe(new AudioLoader(GuildMusicManager.getInstance(guild.getIdLong()), message));
+        Main.LAVALINK.getOrCreateLink(guild.getIdLong()).loadItem(query).subscribe(new AudioLoader(GuildMusicManager.getInstance(guild.getIdLong()), message));
 
     }
 

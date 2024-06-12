@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SkipCommand implements ICommand<SlashCommandInteractionEvent> {
+public class SkipSlashCommand implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SkipCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SkipSlashCommand.class);
 
     @NotNull
     @Override

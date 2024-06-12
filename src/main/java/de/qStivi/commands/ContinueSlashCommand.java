@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StopCommand implements ICommand<SlashCommandInteractionEvent> {
+public class ContinueSlashCommand implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StopCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContinueSlashCommand.class);
 
     @NotNull
     @Override
@@ -21,20 +21,20 @@ public class StopCommand implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
-        event.getHook().editOriginal("Stopping...").complete();
+        event.getHook().editOriginal("Continuing...").complete();
 
-        GuildMusicManager.getInstance(event.getGuild().getIdLong()).stop();
+        GuildMusicManager.getInstance(event.getGuild().getIdLong()).continuePlaying();
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "stop";
+        return "continue";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Stops the current playback.";
+        return "Continues the current playback.";
     }
 }

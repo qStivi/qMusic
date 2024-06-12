@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PauseCommand implements ICommand<SlashCommandInteractionEvent> {
+public class PauseSlashCommand implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PauseCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PauseSlashCommand.class);
 
     @NotNull
     @Override

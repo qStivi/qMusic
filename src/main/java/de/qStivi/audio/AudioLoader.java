@@ -26,6 +26,8 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
         LOGGER.info("Track loaded and enqueued: {}", track.getInfo().getTitle());
     }
 
+
+
     @Override
     public void onPlaylistLoaded(@NotNull PlaylistLoaded result) {
         this.mngr.scheduler.enqueuePlaylist(result.getTracks());
@@ -34,6 +36,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
     @Override
     public void onSearchResultLoaded(@NotNull SearchResult result) {
+        LOGGER.info("Search result loaded.");
         final List<Track> tracks = result.getTracks();
 
         if (tracks.isEmpty()) {
@@ -51,10 +54,12 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     @Override
     public void noMatches() {
         LOGGER.info("No matches found for your input!");
+        message.edit("No matches found for your input!");
     }
 
     @Override
     public void loadFailed(@NotNull LoadFailed result) {
         LOGGER.error("Failed to load track: {}", result.getException().getMessage());
+        message.edit(result.getException().getMessage());
     }
 }

@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoopCommand implements ICommand<SlashCommandInteractionEvent> {
+public class StopSlashCommand implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoopCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StopSlashCommand.class);
 
     @NotNull
     @Override
@@ -21,26 +21,20 @@ public class LoopCommand implements ICommand<SlashCommandInteractionEvent> {
 
     @Override
     public void handle(SlashCommandInteractionEvent event, ChatMessage message) {
-        var isLooping = GuildMusicManager.getInstance(event.getGuild().getIdLong()).scheduler.loop;
+        event.getHook().editOriginal("Stopping...").complete();
 
-        if (isLooping) {
-            message.edit("Looping disabled.");
-        } else {
-            message.edit("Looping enabled.");
-        }
-
-        GuildMusicManager.getInstance(event.getGuild().getIdLong()).loop();
+        GuildMusicManager.getInstance(event.getGuild().getIdLong()).stop();
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "loop";
+        return "stop";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Loops the current playback.";
+        return "Stops the current playback.";
     }
 }
