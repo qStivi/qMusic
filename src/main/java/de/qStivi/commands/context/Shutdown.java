@@ -3,16 +3,12 @@ package de.qStivi.commands.context;
 import de.qStivi.ChatMessage;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
-import de.qStivi.commands.slash.Stop;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.TimeUnit;
 
 public class Shutdown implements ICommand<UserContextInteractionEvent> {
 

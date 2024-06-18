@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class CommandHandler extends ListenerAdapter {
 
     static {
         LOGGER.info("Registering commands.");
-        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Continue(), new Stop(), new Loop(), new Shuffle(), new First(), new GetQueue());
+        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Continue(), new Stop(), new Loop(), new Shuffle(), new Next(), new GetQueue());
         registerUserContextCommands(new Shutdown());
     }
 
@@ -68,10 +69,11 @@ public class CommandHandler extends ListenerAdapter {
             if (command.getCommand().getName().equals(event.getName())) {
                 new Thread(() -> {
                     try {
+                        LOGGER.info("{} issued the {} command.", event.getUser().getName(), command.getName());
                         command.handle((SlashCommandInteractionEvent) event);
                     } catch (NoResultsException | IOException e) {
                         LOGGER.error(e.getMessage());
-                        ChatMessage.getInstance(event.getHook(), false).edit(e.getMessage());
+                        ChatMessage.getInstance(event, false).edit(e.getMessage());
                     }
                 }).start();
             }
@@ -83,7 +85,7 @@ public class CommandHandler extends ListenerAdapter {
                 try {
                     command.handle((UserContextInteractionEvent) event);
                 } catch (NoResultsException | IOException e) {
-                    ChatMessage.getInstance(event.getHook(), true).edit(e.getMessage());
+                    ChatMessage.getInstance(event, true).edit(e.getMessage());
                 }
             }
         }

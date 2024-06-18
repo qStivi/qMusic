@@ -48,6 +48,7 @@ public class Lavalink {
         });
 
         LAVALINK.on(PlayerUpdateEvent.class).subscribe((event) -> {
+            LOGGER.debug("PlayerUpdateEvent: {}", event);
             LAVALINK.getLinks().forEach((link) -> {
                 var track = link.getPlayer().block().getTrack();
                 while (track == null) {
@@ -58,7 +59,14 @@ public class Lavalink {
                 var position = link.getCachedPlayer().getPosition();
                 var duration = trackInfo.getLength();
                 var progressBar = generateProgressBar(position, duration);
-                ChatMessage.getInstance().edit(progressBar + "\n" + trackInfo.getUri());
+
+                var sb = new StringBuilder();
+                if (AudioLoader.getInstance(link.getGuildId()).mngr.scheduler.loop) {
+                    sb.append(":repeat_one: Looping enabled :repeat_one:\n");
+                }
+                sb.append(progressBar).append("\n").append(trackInfo.getUri());
+
+                ChatMessage.getInstance().edit(sb.toString());
             });
         });
 
@@ -103,7 +111,7 @@ public class Lavalink {
         String totalTime = formatTime(duration / 1000);
 
         // Combine time and progress bar
-        return String.format("%s %s %s", currentTime, progressBar.toString(), totalTime);
+        return String.format("%s %s %s", currentTime, progressBar, totalTime);
     }
 
     private static String formatTime(long timeInSeconds) {

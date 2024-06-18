@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class First implements ICommand<SlashCommandInteractionEvent> {
+public class Next implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(First.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Next.class);
     private static final String QUERY = "query";
 
     @NotNull
@@ -47,7 +47,7 @@ public class First implements ICommand<SlashCommandInteractionEvent> {
         joinHelper(event);
 
         var al = AudioLoader.getInstance(guild.getIdLong());
-                al.shouldSkipQueue(true);
+        al.shouldSkipQueue(true);
 
         Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
 
@@ -89,13 +89,13 @@ public class First implements ICommand<SlashCommandInteractionEvent> {
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
         }
 
-        ChatMessage.getInstance(event.getHook()).edit("Joining your channel!");
+        ChatMessage.getInstance(event).edit("Joining your channel!");
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "first";
+        return "next";
     }
 
     @NotNull

@@ -34,7 +34,7 @@ public class Shuffle implements ICommand<SlashCommandInteractionEvent> {
         var queue = scheduler.queue;
 
         if (queue.isEmpty()) {
-            ChatMessage.getInstance(event.getHook()).edit("Queue is empty.");
+            ChatMessage.getInstance(event).edit("Queue is empty.");
             return;
         }
 

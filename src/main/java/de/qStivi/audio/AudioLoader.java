@@ -14,11 +14,6 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     private static final HashMap<Long, AudioLoader> INSTANCE_MAP = new HashMap<>();
     public final GuildMusicManager mngr;
     private final Long guildID;
-
-    public void shouldSkipQueue(boolean shouldSkipQueue) {
-        this.shouldSkipQueue = shouldSkipQueue;
-    }
-
     public boolean shouldSkipQueue = false;
 
     private AudioLoader(Long guildID) {
@@ -37,6 +32,9 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
         }
     }
 
+    public void shouldSkipQueue(boolean shouldSkipQueue) {
+        this.shouldSkipQueue = shouldSkipQueue;
+    }
 
     @Override
     public void ontrackLoaded(@NotNull TrackLoaded result) {

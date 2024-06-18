@@ -1,6 +1,5 @@
 package de.qStivi.commands.slash;
 
-import de.qStivi.ChatMessage;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -23,10 +22,8 @@ public class Continue implements ICommand<SlashCommandInteractionEvent> {
     @Override
     public void handle(SlashCommandInteractionEvent event) {
         event.deferReply().complete();
-        LOGGER.info("Handling continue command...");
-        ChatMessage.getInstance(event.getHook()).edit("Continuing...");
-
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.continuePlaying();
+        event.reply("Continued.").queue((m) -> m.deleteOriginal().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
     }
 
     @NotNull

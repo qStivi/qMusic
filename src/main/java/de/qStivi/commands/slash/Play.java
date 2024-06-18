@@ -50,7 +50,7 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
 
         Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
 
-        ChatMessage.getInstance(event.getHook()).edit("Loading your song!");
+        ChatMessage.getInstance(event).edit("Loading your song!");
 
     }
 
@@ -70,7 +70,7 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
         }
 
-        ChatMessage.getInstance(event.getHook()).edit("Joining your channel!");
+        ChatMessage.getInstance(event).edit("Joining your channel!");
     }
 
     @NotNull

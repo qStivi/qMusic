@@ -1,6 +1,5 @@
 package de.qStivi.commands.slash;
 
-import de.qStivi.ChatMessage;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,14 +23,13 @@ public class Loop implements ICommand<SlashCommandInteractionEvent> {
     public void handle(SlashCommandInteractionEvent event) {
         event.deferReply().complete();
         var isLooping = AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.scheduler.loop;
+        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.loop();
 
         if (isLooping) {
-            ChatMessage.getInstance(event.getHook()).edit("Looping disabled.");
+            event.reply("Looping enabled.").queue((m) -> m.deleteOriginal().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
         } else {
-            ChatMessage.getInstance(event.getHook()).edit("Looping enabled.");
+            event.reply("Looping disabled.").queue((m) -> m.deleteOriginal().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
         }
-
-        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.loop();
     }
 
     @NotNull

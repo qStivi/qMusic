@@ -1,19 +1,23 @@
 package de.qStivi;
 
-import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import javax.annotation.Nullable;
 
 public class ChatMessage {
 
     public static ChatMessage instance;
-    private final InteractionHook interactionHook;
+    private final GenericCommandInteractionEvent event;
+    private final Message message;
 
-    private ChatMessage(InteractionHook interactionHook) {
-        this.interactionHook = interactionHook;
+    private ChatMessage(GenericCommandInteractionEvent event) {
+        this.event = event;
+        this.message = event.getHook().retrieveOriginal().complete();
     }
 
-    public static ChatMessage getInstance(InteractionHook interactionHook) {
+    public static ChatMessage getInstance(GenericCommandInteractionEvent interactionHook) {
         if (instance == null) {
             instance = new ChatMessage(interactionHook);
         }
@@ -25,11 +29,11 @@ public class ChatMessage {
         return instance;
     }
 
-    public static ChatMessage getInstance(InteractionHook hook, boolean ephemeral) {
+    public static ChatMessage getInstance(GenericCommandInteractionEvent hook, boolean ephemeral) {
         if (instance == null) {
             instance = new ChatMessage(hook);
         }
-        instance.interactionHook.setEphemeral(ephemeral);
+        instance.event.getHook().setEphemeral(ephemeral);
         return instance;
     }
 
@@ -37,14 +41,14 @@ public class ChatMessage {
         if (instance == null) {
             throw new IllegalStateException("Instance is null.");
         }
-        interactionHook.editOriginal(message).complete();
+        this.message.editMessage(message).complete();
     }
 
     public void delete() {
         if (instance == null) {
             throw new IllegalStateException("Instance is null.");
         }
-        interactionHook.deleteOriginal().complete();
+        message.delete().complete();
         instance = null;
     }
 }

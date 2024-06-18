@@ -2,20 +2,16 @@ package de.qStivi.audio;
 
 import de.qStivi.ChatMessage;
 import de.qStivi.Lavalink;
-import de.qStivi.Main;
-import dev.arbjerg.lavalink.client.Link;
-import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class GuildMusicManager {
     private static final Map<Long, GuildMusicManager> INSTANCE_MAP = new HashMap<>();
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(GuildMusicManager.class);
     public final TrackScheduler scheduler = new TrackScheduler(this);
     public final long guildId;
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(GuildMusicManager.class);
 
     public GuildMusicManager(long guildId) {
         this.guildId = guildId;
@@ -38,8 +34,8 @@ public class GuildMusicManager {
         this.scheduler.queue.clear();
         LOGGER.info("Queue cleared.");
         Lavalink.getCachedPlayer(guildId).setPaused(false)
-                        .setTrack(null)
-                        .subscribe();
+                .setTrack(null)
+                .subscribe();
         LOGGER.info("Set paused to false and track set to null.");
     }
 

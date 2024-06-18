@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Queue;
 
 public class TrackScheduler {
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(TrackScheduler.class);
     public final Queue<Track> queue = new LinkedList<>();
     private final GuildMusicManager guildMusicManager;
     public boolean loop = false;
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(TrackScheduler.class);
 
     public TrackScheduler(GuildMusicManager guildMusicManager) {
         this.guildMusicManager = guildMusicManager;
@@ -66,7 +66,7 @@ public class TrackScheduler {
 
             // Loop the last track if loop is enabled
             if (this.loop) {
-                LOGGER.info("Looping last track: {}", lastTrack);
+                LOGGER.info("Looping last track: {}", lastTrack.getInfo().getTitle());
                 this.startTrack(lastTrack);
                 return;
             }
@@ -76,7 +76,7 @@ public class TrackScheduler {
 
             // Start the next track if there is one
             if (nextTrack != null) {
-                LOGGER.info("Next track: {}", nextTrack);
+                LOGGER.info("Next track: {}", nextTrack.getInfo().getTitle());
                 this.startTrack(nextTrack);
             } else {
                 LOGGER.info("No more tracks in queue.");
@@ -89,9 +89,9 @@ public class TrackScheduler {
         LOGGER.info("Starting track: {}", track.getInfo().getTitle());
 
         Lavalink.get(guildMusicManager.guildId).createOrUpdatePlayer()
-                        .setTrack(track)
-                        .setVolume(35)
-                        .subscribe();
+                .setTrack(track)
+                .setVolume(35)
+                .subscribe();
 
         LOGGER.info("Track started: {}", track.getInfo().getTitle());
     }
