@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master  # Ensure this matches your branch name
+      - master
 
 jobs:
   build:
@@ -30,29 +30,38 @@ jobs:
             latest_tag="v0.0.0"
           fi
           echo "Latest tag: $latest_tag"
-          echo "::set-output name=latest_tag::$latest_tag"
+          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
 
       - name: Bump version
         id: bump_version
         run: |
-          latest_tag=${{ steps.get_latest_tag.outputs.latest_tag }}
+          latest_tag=${{ env.latest_tag }}
           version=$(echo $latest_tag | cut -d'v' -f 2)
           major=$(echo $version | cut -d'.' -f 1)
           minor=$(echo $version | cut -d'.' -f 2)
           patch=$(echo $version | cut -d'.' -f 3)
-          new_version="v$major.$minor.$((patch + 1))"
+
+          while true; do
+            new_version="v$major.$minor.$((patch + 1))"
+            if git rev-parse "$new_version" >/dev/null 2>&1; then
+              patch=$((patch + 1))
+            else
+              break
+            fi
+          done
+
           echo "New version: $new_version"
-          echo "::set-output name=new_version::$new_version"
+          echo "new_version=$new_version" >> $GITHUB_ENV
 
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.bump_version.outputs.new_version }}
-          name: Release ${{ steps.bump_version.outputs.new_version }}
+          tag: ${{ env.new_version }}
+          name: Release ${{ env.new_version }}
           draft: false
           prerelease: false
-          body: "Automated release of version ${{ steps.bump_version.outputs.new_version }}"
+          body: "Automated release of version ${{ env.new_version }}"
           token: ${{ secrets.MY_GITHUB_TOKEN }}
       
       - name: Upload release asset
@@ -62,4 +71,3 @@ jobs:
           asset_path: target/MusicBot-1.jar
           asset_name: qMusic.jar
           asset_content_type: application/java-archive
-          token: ${{ secrets.MY_GITHUB_TOKEN }}
