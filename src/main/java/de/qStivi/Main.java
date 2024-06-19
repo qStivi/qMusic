@@ -24,6 +24,6 @@ public class Main {
         JDA = JDABuilder.createLight(Properties.DISCORD).addEventListeners(new DiscordListeners(), new ControlsManager(), new CommandHandler()).setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.VOICE).setVoiceDispatchInterceptor(new JDAVoiceUpdateListener(Lavalink.getClient())).setActivity(Activity.playing("/help")).build();
 
         CommandHandler.updateCommands();
-
+// test
     }
 }
