@@ -25,37 +25,36 @@ jobs:
       - name: Get latest tag
         id: get_latest_tag
         run: |
-          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          latest_tag=$(git tag | sort -V | tail -n1)
           if [ -z "$latest_tag" ]; then
             latest_tag="v0.0.0"
           fi
           echo "Latest tag: $latest_tag"
           echo "::set-output name=latest_tag::$latest_tag"
 
-      - name: Increment tag
-        id: increment_tag
+      - name: Bump version
+        id: bump_version
         run: |
           latest_tag=${{ steps.get_latest_tag.outputs.latest_tag }}
-          IFS='.' read -r -a parts <<< "${latest_tag#v}"
-          major=${parts[0]}
-          minor=${parts[1]}
-          patch=${parts[2]}
-          new_patch=$((patch + 1))
-          new_tag="v${major}.${minor}.${new_patch}"
-          echo "New tag: $new_tag"
-          echo "::set-output name=new_tag::$new_tag"
+          version=$(echo $latest_tag | cut -d'v' -f 2)
+          major=$(echo $version | cut -d'.' -f 1)
+          minor=$(echo $version | cut -d'.' -f 2)
+          patch=$(echo $version | cut -d'.' -f 3)
+          new_version="v$major.$minor.$((patch + 1))"
+          echo "New version: $new_version"
+          echo "::set-output name=new_version::$new_version"
 
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.increment_tag.outputs.new_tag }}
-          name: Release ${{ steps.increment_tag.outputs.new_tag }}
+          tag: ${{ steps.bump_version.outputs.new_version }}
+          name: Release ${{ steps.bump_version.outputs.new_version }}
           draft: false
           prerelease: false
-          body: "Automated release of version ${{ steps.increment_tag.outputs.new_tag }}"
+          body: "Automated release of version ${{ steps.bump_version.outputs.new_version }}"
           token: ${{ secrets.MY_GITHUB_TOKEN }}
-
+      
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         with:
