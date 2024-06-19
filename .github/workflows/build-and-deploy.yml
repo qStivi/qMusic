@@ -16,14 +16,13 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          distribution: 'temurin'  # Choose the distribution you need
-          java-version: '22'  # Ensure this matches the Java version you need
+          distribution: 'temurin'
+          java-version: '22'
 
       - name: Build with Maven
         run: mvn clean package
 
       - name: Get short commit SHA
-        id: vars
         run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Create release
@@ -35,12 +34,11 @@ jobs:
           draft: false
           prerelease: false
           body: "Automated release of version ${{ env.short_sha }}"
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/MusicBot-1.jar  # Adjusted to your Maven artifact path
+          asset_path: target/MusicBot-1.jar
           asset_name: qMusic.jar
           asset_content_type: application/java-archive
