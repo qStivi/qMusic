@@ -25,23 +25,25 @@ jobs:
       - name: Get date and time for version
         id: get_datetime
         run: |
-          datetime=$(date +'%Y-%m-%d_%H-%M')
+          datetime=$(date +'%Y%m%d%H%M')
           echo "datetime=$datetime" >> $GITHUB_ENV
 
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: auto-release-${{ env.datetime }}
-          name: "Automated Release ${{ env.datetime }}"
+          tag: v${{ env.datetime }}
+          name: "Automated Release v${{ env.datetime }}"
           draft: false
           prerelease: false
-          body: "Automated release generated on ${{ env.datetime }}"
+          body: "Automated release generated on v${{ env.datetime }}"
           token: ${{ secrets.MY_GITHUB_TOKEN }}
           generateReleaseNotes: true
       
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: target/MusicBot-1.jar
