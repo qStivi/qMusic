@@ -62,3 +62,4 @@ jobs:
           asset_path: target/MusicBot-1.jar
           asset_name: qMusic.jar
           asset_content_type: application/java-archive
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
