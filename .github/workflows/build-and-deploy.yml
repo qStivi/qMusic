@@ -44,4 +44,3 @@ jobs:
           asset_path: target/MusicBot-1.jar  # Adjusted to your Maven artifact path
           asset_name: qMusic.jar
           asset_content_type: application/java-archive
-          token: ${{ secrets.GITHUB_TOKEN }}
