@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/MusicBot-1.jar
+          asset_path: target/MusicBot-1-jar-with-dependencies-jar-with-dependencies.jar
           asset_name: qMusic.jar
           asset_content_type: application/java-archive
         env:
