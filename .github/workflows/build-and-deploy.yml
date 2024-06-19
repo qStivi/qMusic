@@ -24,23 +24,24 @@ jobs:
 
       - name: Get short commit SHA
         id: vars
-        run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: v${{ steps.vars.outputs.short_sha }}
-          release_name: Release ${{ steps.vars.outputs.short_sha }}
+          tag: v${{ env.short_sha }}
+          name: Release ${{ env.short_sha }}
           draft: false
           prerelease: false
-          body: "Automated release of version ${{ steps.vars.outputs.short_sha }}"
+          body: "Automated release of version ${{ env.short_sha }}"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/qMusic.jar  # Adjust to your Maven artifact path
+          asset_path: target/MusicBot-1.jar  # Adjusted to your Maven artifact path
           asset_name: qMusic.jar
           asset_content_type: application/java-archive
+          token: ${{ secrets.GITHUB_TOKEN }}
