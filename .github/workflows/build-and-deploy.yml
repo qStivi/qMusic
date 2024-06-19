@@ -26,6 +26,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication
           tag_name: ${{ github.sha }}
           release_name: Release ${{ github.sha }}
           draft: false
