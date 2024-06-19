@@ -1,17 +1,33 @@
-name: Test Workflow
+name: Test GitHub Credentials
 
 on:
   push:
     branches:
-      - main
+      - master  # Adjust if your main branch is named differently
 
 jobs:
-  build:
+  test-credentials:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run a one-liner script
-        run: echo "Hello, world!"
+      - name: Create release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: test-${{ github.sha }}
+          name: Test Release ${{ github.sha }}
+          draft: false
+          prerelease: false
+          body: "Automated test release of commit ${{ github.sha }}"
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dummy.txt
+          asset_name: dummy.txt
+          asset_content_type: text/plain
