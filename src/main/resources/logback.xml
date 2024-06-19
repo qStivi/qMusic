@@ -2,11 +2,30 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %boldCyan(%-28.-28logger{0}) %red(%10.10X{jda.shard}) %boldGreen(%-15.-15M) %highlight(%-6level) %msg%n</pattern>
+            <pattern>%d{HH:mm:ss} %boldCyan(%-28.-28logger{0}) %red(%10.10X{jda.shard}) %boldGreen(%-15.-15M) %highlight(%-6level) %msg%n</pattern>
         </encoder>
+        <!-- Filter for all levels except DEBUG -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="DEBUG_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%white(%d{HH:mm:ss}) %white(%-28.-28logger{0}) %white(%10.10X{jda.shard}) %white(%-15.-15M) %white(%-6level) %white(%msg%n)</pattern>
+        </encoder>
+        <!-- Filter for DEBUG level -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
     </appender>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="DEBUG_STDOUT"/>
     </root>
 </configuration>
