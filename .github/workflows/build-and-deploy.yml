@@ -3,11 +3,12 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master
+      - master  # Ensure this matches your branch name
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -15,7 +16,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: '22'  # Java 22
+          distribution: 'temurin'  # Choose the distribution you need
+          java-version: '22'  # Ensure this matches the Java version you need
 
       - name: Build with Maven
         run: mvn clean package
