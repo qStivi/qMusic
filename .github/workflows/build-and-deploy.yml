@@ -22,46 +22,21 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      - name: Get latest tag
-        id: get_latest_tag
+      - name: Get date and time for version
+        id: get_datetime
         run: |
-          latest_tag=$(git tag | sort -V | tail -n1)
-          if [ -z "$latest_tag" ]; then
-            latest_tag="v0.0.0"
-          fi
-          echo "Latest tag: $latest_tag"
-          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
-
-      - name: Bump version
-        id: bump_version
-        run: |
-          latest_tag=${{ env.latest_tag }}
-          version=$(echo $latest_tag | cut -d'v' -f 2)
-          major=$(echo $version | cut -d'.' -f 1)
-          minor=$(echo $version | cut -d'.' -f 2)
-          patch=$(echo $version | cut -d'.' -f 3)
-
-          while true; do
-            new_version="v$major.$minor.$((patch + 1))"
-            if git rev-parse "$new_version" >/dev/null 2>&1; then
-              patch=$((patch + 1))
-            else
-              break
-            fi
-          done
-
-          echo "New version: $new_version"
-          echo "new_version=$new_version" >> $GITHUB_ENV
+          datetime=$(date +'%Y%m%d%H%M')
+          echo "datetime=$datetime" >> $GITHUB_ENV
 
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ env.new_version }}
-          name: Release ${{ env.new_version }}
+          tag: v${{ env.datetime }}
+          name: Release v${{ env.datetime }}
           draft: false
           prerelease: false
-          body: "Automated release of version ${{ env.new_version }}"
+          body: "Automated release of version v${{ env.datetime }}"
           token: ${{ secrets.MY_GITHUB_TOKEN }}
       
       - name: Upload release asset
