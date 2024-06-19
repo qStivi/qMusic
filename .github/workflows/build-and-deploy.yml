@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master
+      - master  # Ensure this matches your branch name
 
 jobs:
   build:
@@ -22,18 +22,40 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      - name: Get short commit SHA
-        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "Latest tag: $latest_tag"
+          echo "::set-output name=latest_tag::$latest_tag"
+
+      - name: Increment tag
+        id: increment_tag
+        run: |
+          latest_tag=${{ steps.get_latest_tag.outputs.latest_tag }}
+          if [ -z "$latest_tag" ]; then
+            new_tag="v1.0.0"
+          else
+            IFS='.' read -r -a parts <<< "${latest_tag#v}"
+            major=${parts[0]}
+            minor=${parts[1]}
+            patch=${parts[2]}
+            new_patch=$((patch + 1))
+            new_tag="v${major}.${minor}.${new_patch}"
+          fi
+          echo "New tag: $new_tag"
+          echo "::set-output name=new_tag::$new_tag"
 
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: v${{ env.short_sha }}
-          name: Release ${{ env.short_sha }}
+          tag: ${{ steps.increment_tag.outputs.new_tag }}
+          name: Release ${{ steps.increment_tag.outputs.new_tag }}
           draft: false
           prerelease: false
-          body: "Automated release of version ${{ env.short_sha }}"
+          body: "Automated release of version ${{ steps.increment_tag.outputs.new_tag }}"
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
