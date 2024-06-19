@@ -24,14 +24,14 @@ jobs:
 
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication
-          tag_name: ${{ github.sha }}
+          tag: ${{ github.sha }}
           release_name: Release ${{ github.sha }}
           draft: false
           prerelease: false
           body: "Automated release of version ${{ github.sha }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
