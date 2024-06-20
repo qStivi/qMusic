@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 public class Shutdown implements ICommand<UserContextInteractionEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Shutdown.class);
+    private static final String ID = "219108246143631364";
 
     @NotNull
     @Override
@@ -24,7 +25,7 @@ public class Shutdown implements ICommand<UserContextInteractionEvent> {
     public void handle(UserContextInteractionEvent event) {
         event.reply("Shutting down...").setEphemeral(true).complete();
         event.getInteraction().getHook().deleteOriginal().complete();
-        if (event.getJDA().getSelfUser().getId().equals(event.getTarget().getId()) && event.getUser().getId().equals("219108246143631364")) {
+        if (event.getJDA().getSelfUser().getId().equals(event.getTarget().getId()) && event.getUser().getId().equals(ID)) {
             try {
                 AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.stop();
                 ChatMessage.getInstance(event).delete();
