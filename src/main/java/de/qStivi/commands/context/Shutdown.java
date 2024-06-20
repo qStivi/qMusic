@@ -25,9 +25,18 @@ public class Shutdown implements ICommand<UserContextInteractionEvent> {
         event.reply("Shutting down...").setEphemeral(true).complete();
         event.getInteraction().getHook().deleteOriginal().complete();
         if (event.getJDA().getSelfUser().getId().equals(event.getTarget().getId()) && event.getUser().getId().equals("219108246143631364")) {
-            AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.stop();
-            ChatMessage.getInstance().delete();
-            event.getJDA().shutdown();
+            try {
+                AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.stop();
+                ChatMessage.getInstance(event).delete();
+                event.getJDA().shutdown();
+
+            } catch (RuntimeException e) {
+                LOGGER.error("Error while shutting down!", e);
+            }
+
+            LOGGER.info("Shutting down...");
+            System.exit(0);
+
         }
     }
 
