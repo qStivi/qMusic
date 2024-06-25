@@ -1,5 +1,6 @@
 package de.qStivi.commands.slash;
 
+import de.qStivi.ChatMessage;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -28,6 +29,7 @@ public class Stop implements ICommand<SlashCommandInteractionEvent> {
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.stop();
 
         event.getHook().editOriginal("Stopped playback.").queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
+        ChatMessage.getInstance().delete();
     }
 
     @NotNull

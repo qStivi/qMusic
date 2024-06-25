@@ -25,7 +25,7 @@ public class Skip implements ICommand<SlashCommandInteractionEvent> {
 
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.skip();
 
-        event.reply("Skipped.").queue((m) -> m.deleteOriginal().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
+        event.getHook().editOriginal("Skipped.").queue((m) -> m.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
     }
 
     @NotNull

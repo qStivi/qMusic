@@ -23,7 +23,7 @@ public class Continue implements ICommand<SlashCommandInteractionEvent> {
     public void handle(SlashCommandInteractionEvent event) {
         event.deferReply().complete();
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.continuePlaying();
-        event.reply("Continued.").queue((m) -> m.deleteOriginal().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
+        event.getHook().editOriginal("Continued.").queue((m) -> m.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
     }
 
     @NotNull

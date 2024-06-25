@@ -25,7 +25,7 @@ public class Pause implements ICommand<SlashCommandInteractionEvent> {
 
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.pause();
 
-        event.reply("Paused.").queue((m) -> m.deleteOriginal().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
+        event.getHook().editOriginal("Paused.").queue((m) -> m.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
     }
 
     @NotNull
