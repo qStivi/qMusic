@@ -15,6 +15,8 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     public final GuildMusicManager mngr;
     private final Long guildID;
     public boolean shouldSkipQueue = false;
+    public boolean shouldSkipCurrent = false;
+    public boolean shuffle = false;
 
     private AudioLoader(Long guildID) {
         this.mngr = new GuildMusicManager(guildID);
@@ -36,16 +38,28 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
         this.shouldSkipQueue = shouldSkipQueue;
     }
 
+    public void shouldSkipCurrent(boolean shouldSkipCurrent) {
+        this.shouldSkipCurrent = shouldSkipCurrent;
+    }
+
     @Override
     public void ontrackLoaded(@NotNull TrackLoaded result) {
         final Track track = result.getTrack();
-        this.mngr.scheduler.enqueue(track, this.shouldSkipQueue);
+        this.mngr.scheduler.enqueue(track, this.shouldSkipQueue, this.shouldSkipCurrent);
         LOGGER.info("Track loaded and enqueued: {}", track.getInfo().getTitle());
+        if (this.shouldSkipCurrent) {
+            mngr.skip();
+            this.shouldSkipCurrent = false;
+        }
     }
 
     @Override
     public void onPlaylistLoaded(@NotNull PlaylistLoaded result) {
-        this.mngr.scheduler.enqueuePlaylist(result.getTracks());
+        this.mngr.scheduler.enqueuePlaylist(result.getTracks(), this.shouldSkipQueue, this.shouldSkipCurrent, this.shuffle);
+        if (this.shouldSkipCurrent) {
+            mngr.skip();
+            this.shouldSkipCurrent = false;
+        }
         LOGGER.info("Playlist loaded and enqueued. Enqueued {} tracks.", result.getTracks().size());
     }
 
@@ -61,7 +75,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
         final Track firstTrack = tracks.get(0);
 
-        this.mngr.scheduler.enqueue(firstTrack, this.shouldSkipQueue);
+        this.mngr.scheduler.enqueue(firstTrack, this.shouldSkipQueue, this.shouldSkipCurrent);
 
         LOGGER.info("Search result loaded and enqueued: {}", firstTrack.getInfo().getTitle());
     }
@@ -76,5 +90,9 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     public void loadFailed(@NotNull LoadFailed result) {
         LOGGER.error("Failed to load track: {}", result.getException().getMessage());
         ChatMessage.getInstance().edit(result.getException().getMessage());
+    }
+
+    public void shuffle(boolean shuffle) {
+        this.shuffle = shuffle;
     }
 }

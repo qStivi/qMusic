@@ -29,7 +29,7 @@ public class CommandHandler extends ListenerAdapter {
 
     static {
         LOGGER.info("Registering commands.");
-        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Continue(), new Stop(), new Loop(), new Shuffle(), new Next(), new GetQueue());
+        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Continue(), new Stop(), new Loop(), new Shuffle(), new Next(), new GetQueue(), new PlayNow());
         registerUserContextCommands(new Shutdown());
     }
 

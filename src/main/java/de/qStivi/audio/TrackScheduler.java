@@ -21,7 +21,7 @@ public class TrackScheduler {
         LOGGER.info("New TrackScheduler initialized.");
     }
 
-    public void enqueue(Track track, boolean shouldSkipQueue) {
+    public void enqueue(Track track, boolean shouldSkipQueue, boolean shouldPlayNow) {
         LOGGER.info("Enqueuing track: {}", track.getInfo().getTitle());
 
         if (Lavalink.getCachedPlayer(guildMusicManager.guildId).getTrack() == null) {
@@ -43,11 +43,27 @@ public class TrackScheduler {
         LOGGER.info("Track enqueued: {}", track.getInfo().getTitle());
     }
 
-    public void enqueuePlaylist(List<Track> tracks) {
+    public void enqueuePlaylist(List<Track> tracks, boolean shouldSkipQueue, boolean shouldPlayNow, boolean shuffle) {
         LOGGER.info("Enqueuing playlist with {} tracks.", tracks.size());
-        this.queue.addAll(tracks);
+
+        if (shuffle) {
+            LOGGER.info("Shuffling playlist.");
+            java.util.Collections.shuffle(tracks);
+        }
 
         if (Lavalink.getCachedPlayer(guildMusicManager.guildId).getTrack() == null) {
+            this.queue.addAll(tracks);
+            this.startTrack(this.queue.poll());
+        } else {
+            // If shouldSkipQueue is true, add the track to the front of the queue
+            if (shouldSkipQueue) {
+                var queueCopy = new LinkedList<>(this.queue);
+                this.queue.clear();
+                this.queue.addAll(tracks);
+                this.queue.addAll(queueCopy);
+                AudioLoader.getInstance(guildMusicManager.guildId).shouldSkipQueue(false);
+                return;
+            }
             this.startTrack(this.queue.poll());
         }
 
@@ -88,10 +104,7 @@ public class TrackScheduler {
     private void startTrack(Track track) {
         LOGGER.info("Starting track: {}", track.getInfo().getTitle());
 
-        Lavalink.get(guildMusicManager.guildId).createOrUpdatePlayer()
-                .setTrack(track)
-                .setVolume(35)
-                .subscribe();
+        Lavalink.get(guildMusicManager.guildId).createOrUpdatePlayer().setTrack(track).setVolume(35).subscribe();
 
         LOGGER.info("Track started: {}", track.getInfo().getTitle());
     }
