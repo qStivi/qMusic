@@ -47,7 +47,7 @@ public class Next implements ICommand<SlashCommandInteractionEvent> {
         joinHelper(event);
 
         var al = AudioLoader.getInstance(guild.getIdLong());
-        al.shouldSkipQueue(true);
+        al.setShouldSkipQueue(true);
 
         Lavalink.getLink(guild.getIdLong()).loadItem(query).subscribe(al);
 

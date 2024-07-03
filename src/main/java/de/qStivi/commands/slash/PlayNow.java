@@ -52,9 +52,9 @@ public class PlayNow implements ICommand<SlashCommandInteractionEvent> {
         joinHelper(event);
 
         var al = AudioLoader.getInstance(guild.getIdLong());
-        al.shouldSkipQueue(true);
-        al.shouldSkipCurrent(true);
-        al.shuffle(shuffle);
+        al.setShouldSkipQueue(true);
+        al.setShouldSkipCurrent(true);
+        al.setShuffle(shuffle);
 
         Lavalink.getLink(guild.getIdLong()).loadItem(query).subscribe(al);
 

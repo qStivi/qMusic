@@ -33,7 +33,7 @@ public class TrackScheduler {
                 this.queue.clear();
                 this.queue.offer(track);
                 this.queue.addAll(queueCopy);
-                AudioLoader.getInstance(guildMusicManager.guildId).shouldSkipQueue(false);
+                AudioLoader.getInstance(guildMusicManager.guildId).setShouldSkipQueue(false);
                 return;
             }
             this.queue.offer(track);
@@ -61,7 +61,7 @@ public class TrackScheduler {
                 this.queue.clear();
                 this.queue.addAll(tracks);
                 this.queue.addAll(queueCopy);
-                AudioLoader.getInstance(guildMusicManager.guildId).shouldSkipQueue(false);
+                AudioLoader.getInstance(guildMusicManager.guildId).setShouldSkipQueue(false);
                 return;
             }
             this.startTrack(this.queue.poll());

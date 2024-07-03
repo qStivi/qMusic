@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Continue implements ICommand<SlashCommandInteractionEvent> {
+public class Resume implements ICommand<SlashCommandInteractionEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Continue.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resume.class);
 
     @NotNull
     @Override
@@ -23,18 +23,18 @@ public class Continue implements ICommand<SlashCommandInteractionEvent> {
     public void handle(SlashCommandInteractionEvent event) {
         event.deferReply().complete();
         AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.continuePlaying();
-        event.getHook().editOriginal("Continued.").queue((m) -> m.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
+        event.getHook().editOriginal("Resumed.").queue((m) -> m.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "continue";
+        return "resume";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Continues the current playback.";
+        return "Resumes the current playback.";
     }
 }
