@@ -39,7 +39,7 @@ public class ChatMessage {
     }
 
     public void edit(String message) {
-        if (instance == null) {
+        if (this.message == null) {
             throw new IllegalStateException("Instance is null.");
         }
         try {
@@ -55,7 +55,7 @@ public class ChatMessage {
     }
 
     public void delete() {
-        if (instance == null) {
+        if (this.message == null) {
             throw new IllegalStateException("Instance is null.");
         }
         try {
@@ -71,3 +71,4 @@ public class ChatMessage {
         }
     }
 }
+
