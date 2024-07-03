@@ -29,6 +29,9 @@ public class ChatMessage {
 
     @Nullable
     public static ChatMessage getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Instance is not initialized.");
+        }
         return instance;
     }
 
@@ -71,4 +74,3 @@ public class ChatMessage {
         }
     }
 }
-

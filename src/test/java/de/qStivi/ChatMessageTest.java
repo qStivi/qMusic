@@ -37,8 +37,7 @@ public class ChatMessageTest {
 
     @Test(expected = IllegalStateException.class)
     public void testEditWithoutInstance() {
-        ChatMessage instance = ChatMessage.getInstance();
-        instance.edit("Test message");
+        ChatMessage.getInstance().edit("Test message");
     }
 
     @Test
@@ -50,8 +49,7 @@ public class ChatMessageTest {
 
     @Test(expected = IllegalStateException.class)
     public void testDeleteWithoutInstance() {
-        ChatMessage instance = ChatMessage.getInstance();
-        instance.delete();
+        ChatMessage.getInstance().delete();
     }
 
     @Test
