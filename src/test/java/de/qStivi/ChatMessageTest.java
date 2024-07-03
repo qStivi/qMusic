@@ -4,11 +4,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 public class ChatMessageTest {
 
@@ -17,11 +20,13 @@ public class ChatMessageTest {
 
     @Before
     public void setUp() {
-        eventMock = Mockito.mock(GenericCommandInteractionEvent.class);
-        messageMock = Mockito.mock(Message.class);
-        Mockito.when(eventMock.getHook()).thenReturn(Mockito.mock(InteractionHook.class));
-        Mockito.when(eventMock.getHook().retrieveOriginal()).thenReturn(Mockito.mock(RestAction.class));
+        eventMock = mock(GenericCommandInteractionEvent.class);
+        messageMock = mock(Message.class);
+        Mockito.when(eventMock.getHook()).thenReturn(mock(InteractionHook.class));
+        Mockito.when(eventMock.getHook().retrieveOriginal()).thenReturn(mock(RestAction.class));
         Mockito.when(eventMock.getHook().retrieveOriginal().complete()).thenReturn(messageMock);
+        Mockito.when(messageMock.editMessage(Mockito.anyString())).thenReturn(mock(MessageEditAction.class));
+        Mockito.when(messageMock.delete()).thenReturn(mock(AuditableRestAction.class));
     }
 
     @Test

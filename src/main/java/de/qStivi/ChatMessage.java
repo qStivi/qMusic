@@ -43,8 +43,13 @@ public class ChatMessage {
             throw new IllegalStateException("Instance is null.");
         }
         try {
-            this.message.editMessage(message).complete();
-        } catch (Exception e) {
+            var editAction = this.message.editMessage(message);
+            if (editAction != null) {
+                editAction.complete();
+            } else {
+                throw new RuntimeException("Edit action returned null");
+            }
+        } catch (NullPointerException e) {
             throw new RuntimeException("Failed to edit message", e);
         }
     }
@@ -54,9 +59,14 @@ public class ChatMessage {
             throw new IllegalStateException("Instance is null.");
         }
         try {
-            message.delete().complete();
+            var deleteAction = message.delete();
+            if (deleteAction != null) {
+                deleteAction.complete();
+            } else {
+                throw new RuntimeException("Delete action returned null");
+            }
             instance = null;
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
             throw new RuntimeException("Failed to delete message", e);
         }
     }
