@@ -38,10 +38,12 @@ public class CommandHandler extends ListenerAdapter {
         registerUserContextCommands(new Shutdown());
     }
 
+    @SafeVarargs
     private static void registerSlashCommands(ICommand<SlashCommandInteractionEvent>... commands) {
         SLASH_COMMAND_LIST.addAll(Arrays.asList(commands));
     }
 
+    @SafeVarargs
     private static void registerUserContextCommands(ICommand<UserContextInteractionEvent>... commands) {
         USER_CONTEXT_INTERACTION_COMMAND_LIST.addAll(Arrays.asList(commands));
     }
