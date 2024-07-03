@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
+//TODO There seems to be a bug where a the current song seems to get skipped when a playlist is played while a song is already playing.
+
 public class Play implements ICommand<SlashCommandInteractionEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Play.class);
@@ -35,7 +37,7 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
         event.deferReply().complete();
 
         // Delete message if one already exists
-        if (ChatMessage.getInstance() != null)
+        if (!ChatMessage.isInstanceNull())
             event.getHook().deleteOriginal().queue();
 
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();

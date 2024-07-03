@@ -73,4 +73,11 @@ public class ChatMessage {
             throw new RuntimeException("Failed to delete message", e);
         }
     }
+
+    /**
+     * This method is used to get if the instance is null.
+     */
+    public static boolean isInstanceNull() {
+        return instance == null;
+    }
 }
