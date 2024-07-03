@@ -7,49 +7,46 @@ import dev.arbjerg.lavalink.client.Link;
 import dev.arbjerg.lavalink.client.NodeOptions;
 import dev.arbjerg.lavalink.client.event.*;
 import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Lavalink {
-    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Lavalink.class);
-    private static final LavalinkClient LAVALINK;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Lavalink.class);
+    private static final LavalinkClient LAVALINK_CLIENT;
 
     static {
-        LAVALINK = new LavalinkClient(Helpers.getUserIdFromToken(Properties.DISCORD));
+        LAVALINK_CLIENT = new LavalinkClient(Helpers.getUserIdFromToken(Properties.DISCORD));
         registerLavalinkListeners();
         registerLavalinkNodes();
     }
 
-    public static Link get(long guildID) {
-        return LAVALINK.getOrCreateLink(guildID);
+    public static Link getLink(long guildID) {
+        return LAVALINK_CLIENT.getOrCreateLink(guildID);
     }
 
     public static LavalinkClient getClient() {
-        return LAVALINK;
+        return LAVALINK_CLIENT;
     }
 
     public static LavalinkPlayer getCachedPlayer(long guildID) {
-        return get(guildID).getPlayer().block();
+        return getLink(guildID).getPlayer().block();
     }
 
     private static void registerLavalinkNodes() {
-        LAVALINK.addNode(new NodeOptions.Builder().setName("Node 1").setServerUri("http://192.168.137.150:2333").setPassword("youshallnotpass").build());
+        LAVALINK_CLIENT.addNode(new NodeOptions.Builder().setName("Node 1").setServerUri("http://192.168.137.150:2333").setPassword("youshallnotpass").build());
     }
 
     private static void registerLavalinkListeners() {
+        LAVALINK_CLIENT.on(TrackStartEvent.class).subscribe(event -> LOGGER.debug("{}: track started: {}", event.getNode().getName(), event.getTrack().getInfo()));
 
-        // Subscribe to the TrackStartEvent to log the track start
-        LAVALINK.on(TrackStartEvent.class).subscribe((event) -> LOGGER.debug("{}: track started: {}", event.getNode().getName(), event.getTrack().getInfo()));
+        LAVALINK_CLIENT.on(ReadyEvent.class).subscribe(event -> LOGGER.debug("Node '{}' is ready, session id is '{}'!", event.getNode().getName(), event.getSessionId()));
 
-        // Subscribe to the ReadyEvent to log the session id
-        LAVALINK.on(ReadyEvent.class).subscribe((event) -> LOGGER.debug("Node '{}' is ready, session id is '{}'!", event.getNode().getName(), event.getSessionId()));
+        LAVALINK_CLIENT.on(StatsEvent.class).subscribe(event -> LOGGER.debug("Node '{}' has stats, current players: {}/{} (link count {})", event.getNode().getName(), event.getPlayingPlayers(), event.getPlayers(), LAVALINK_CLIENT.getLinks().size()));
 
-        // Subscribe to the StatsEvent to log some stats
-        LAVALINK.on(StatsEvent.class).subscribe((event) -> {
-            LOGGER.debug("Node '{}' has stats, current players: {}/{} (link count {})", event.getNode().getName(), event.getPlayingPlayers(), event.getPlayers(), LAVALINK.getLinks().size());
-        });
-
-        LAVALINK.on(PlayerUpdateEvent.class).subscribe((event) -> {
+        LAVALINK_CLIENT.on(PlayerUpdateEvent.class).subscribe(event -> {
             LOGGER.debug("PlayerUpdateEvent: {}", event);
-            LAVALINK.getLinks().forEach((link) -> {
+            LAVALINK_CLIENT.getLinks().forEach(link -> {
                 var track = link.getPlayer().block().getTrack();
                 while (track == null) {
                     LOGGER.debug("Track is null, trying to get the track again...");
@@ -70,18 +67,14 @@ public class Lavalink {
             });
         });
 
-        // Subscribe to the TrackStartEvent to handle the track start
-        LAVALINK.on(TrackStartEvent.class).subscribe((event) -> AudioLoader.getInstance(event.getGuildId()).mngr.scheduler.onTrackStart(event.getTrack()));
+        LAVALINK_CLIENT.on(TrackStartEvent.class).subscribe(event -> AudioLoader.getInstance(event.getGuildId()).mngr.scheduler.onTrackStart(event.getTrack()));
 
-        // Subscribe to the TrackEndEvent to handle the track end
-        LAVALINK.on(TrackEndEvent.class).subscribe((event) -> AudioLoader.getInstance(event.getGuildId()).mngr.scheduler.onTrackEnd(event.getTrack(), event.getEndReason()));
+        LAVALINK_CLIENT.on(TrackEndEvent.class).subscribe(event -> AudioLoader.getInstance(event.getGuildId()).mngr.scheduler.onTrackEnd(event.getTrack(), event.getEndReason()));
 
-        // Subscribe to the EmittedEvent to log all events
-        LAVALINK.on(EmittedEvent.class).subscribe((event) -> {
+        LAVALINK_CLIENT.on(EmittedEvent.class).subscribe(event -> {
             if (event instanceof TrackStartEvent) {
                 LOGGER.debug("Is a track start event!");
             }
-
             LOGGER.debug("Node '{}' emitted event: {}", event.getNode().getName(), event);
         });
     }
@@ -119,5 +112,4 @@ public class Lavalink {
         long seconds = timeInSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
-
 }

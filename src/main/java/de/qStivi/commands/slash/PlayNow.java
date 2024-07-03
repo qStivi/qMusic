@@ -56,7 +56,7 @@ public class PlayNow implements ICommand<SlashCommandInteractionEvent> {
         al.shouldSkipCurrent(true);
         al.shuffle(shuffle);
 
-        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
+        Lavalink.getLink(guild.getIdLong()).loadItem(query).subscribe(al);
 
         try {
             Thread.sleep(1000);

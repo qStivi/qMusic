@@ -53,7 +53,7 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
 
         var al = AudioLoader.getInstance(guild.getIdLong());
 
-        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
+        Lavalink.getLink(guild.getIdLong()).loadItem(query).subscribe(al);
 
         ChatMessage.getInstance(event).edit("Loading your song!");
 

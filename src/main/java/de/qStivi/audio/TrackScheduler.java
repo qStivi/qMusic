@@ -104,7 +104,7 @@ public class TrackScheduler {
     private void startTrack(Track track) {
         LOGGER.info("Starting track: {}", track.getInfo().getTitle());
 
-        Lavalink.get(guildMusicManager.guildId).createOrUpdatePlayer().setTrack(track).setVolume(35).subscribe();
+        Lavalink.getLink(guildMusicManager.guildId).createOrUpdatePlayer().setTrack(track).setVolume(35).subscribe();
 
         LOGGER.info("Track started: {}", track.getInfo().getTitle());
     }
