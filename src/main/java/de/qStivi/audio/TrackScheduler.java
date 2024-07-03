@@ -5,13 +5,14 @@ import de.qStivi.Lavalink;
 import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.protocol.v4.Message;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 public class TrackScheduler {
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(TrackScheduler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrackScheduler.class);
     public final Queue<Track> queue = new LinkedList<>();
     private final GuildMusicManager guildMusicManager;
     public boolean loop = false;
@@ -24,20 +25,15 @@ public class TrackScheduler {
     public void enqueue(Track track, boolean shouldSkipQueue, boolean shouldPlayNow) {
         LOGGER.info("Enqueuing track: {}", track.getInfo().getTitle());
 
-        if (Lavalink.getCachedPlayer(guildMusicManager.guildId).getTrack() == null) {
-            this.startTrack(track);
+        if (isPlayerEmpty()) {
+            startTrack(track);
         } else {
-            // If shouldSkipQueue is true, add the track to the front of the queue
             if (shouldSkipQueue) {
-                var queueCopy = new LinkedList<>(this.queue);
-                this.queue.clear();
-                this.queue.offer(track);
-                this.queue.addAll(queueCopy);
-                AudioLoader.getInstance(guildMusicManager.guildId).setShouldSkipQueue(false);
-                return;
+                skipQueue(track);
+            } else {
+                queue.offer(track);
+                LOGGER.info("Track added to queue: {}", track.getInfo().getTitle());
             }
-            this.queue.offer(track);
-            LOGGER.info("Added track to top of queue: {}", track.getInfo().getTitle());
         }
 
         LOGGER.info("Track enqueued: {}", track.getInfo().getTitle());
@@ -47,24 +43,18 @@ public class TrackScheduler {
         LOGGER.info("Enqueuing playlist with {} tracks.", tracks.size());
 
         if (shuffle) {
-            LOGGER.info("Shuffling playlist.");
-            java.util.Collections.shuffle(tracks);
+            shuffleTracks(tracks);
         }
 
-        if (Lavalink.getCachedPlayer(guildMusicManager.guildId).getTrack() == null) {
-            this.queue.addAll(tracks);
-            this.startTrack(this.queue.poll());
+        if (isPlayerEmpty()) {
+            queue.addAll(tracks);
+            startTrack(queue.poll());
         } else {
-            // If shouldSkipQueue is true, add the track to the front of the queue
             if (shouldSkipQueue) {
-                var queueCopy = new LinkedList<>(this.queue);
-                this.queue.clear();
-                this.queue.addAll(tracks);
-                this.queue.addAll(queueCopy);
-                AudioLoader.getInstance(guildMusicManager.guildId).setShouldSkipQueue(false);
-                return;
+                skipQueue(tracks);
+            } else {
+                queue.addAll(tracks);
             }
-            this.startTrack(this.queue.poll());
         }
 
         LOGGER.info("Playlist enqueued.");
@@ -77,35 +67,55 @@ public class TrackScheduler {
 
     public void onTrackEnd(Track lastTrack, Message.EmittedEvent.TrackEndEvent.AudioTrackEndReason endReason) {
         LOGGER.info("Track ended: {}", lastTrack.getInfo().getTitle());
+
         if (endReason.getMayStartNext()) {
-            LOGGER.info("End reason: {}", endReason.name());
-
-            // Loop the last track if loop is enabled
-            if (this.loop) {
-                LOGGER.info("Looping last track: {}", lastTrack.getInfo().getTitle());
-                this.startTrack(lastTrack);
-                return;
-            }
-
-            LOGGER.info("Polling next track from queue.");
-            final var nextTrack = this.queue.poll();
-
-            // Start the next track if there is one
-            if (nextTrack != null) {
-                LOGGER.info("Next track: {}", nextTrack.getInfo().getTitle());
-                this.startTrack(nextTrack);
-            } else {
-                LOGGER.info("No more tracks in queue.");
-                ChatMessage.getInstance().delete();
-            }
+            handleTrackEnd(lastTrack);
         }
     }
 
     private void startTrack(Track track) {
         LOGGER.info("Starting track: {}", track.getInfo().getTitle());
-
         Lavalink.getLink(guildMusicManager.guildId).createOrUpdatePlayer().setTrack(track).setVolume(35).subscribe();
+    }
 
-        LOGGER.info("Track started: {}", track.getInfo().getTitle());
+    private boolean isPlayerEmpty() {
+        return Lavalink.getCachedPlayer(guildMusicManager.guildId).getTrack() == null;
+    }
+
+    private void skipQueue(Track track) {
+        var queueCopy = new LinkedList<>(queue);
+        queue.clear();
+        queue.offer(track);
+        queue.addAll(queueCopy);
+        AudioLoader.getInstance(guildMusicManager.guildId).setShouldSkipQueue(false);
+    }
+
+    private void skipQueue(List<Track> tracks) {
+        var queueCopy = new LinkedList<>(queue);
+        queue.clear();
+        queue.addAll(tracks);
+        queue.addAll(queueCopy);
+        AudioLoader.getInstance(guildMusicManager.guildId).setShouldSkipQueue(false);
+    }
+
+    private void shuffleTracks(List<Track> tracks) {
+        LOGGER.info("Shuffling playlist.");
+        java.util.Collections.shuffle(tracks);
+    }
+
+    private void handleTrackEnd(Track lastTrack) {
+        if (loop) {
+            LOGGER.info("Looping last track: {}", lastTrack.getInfo().getTitle());
+            startTrack(lastTrack);
+        } else {
+            var nextTrack = queue.poll();
+            if (nextTrack != null) {
+                LOGGER.info("Next track: {}", nextTrack.getInfo().getTitle());
+                startTrack(nextTrack);
+            } else {
+                LOGGER.info("No more tracks in queue.");
+                ChatMessage.getInstance().delete();
+            }
+        }
     }
 }
