@@ -1,7 +1,9 @@
 package de.qStivi.commands.context;
 
 import de.qStivi.ChatMessage;
+import de.qStivi.MessageManager;
 import de.qStivi.audio.AudioLoader;
+import de.qStivi.commands.CommandHandler;
 import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -24,20 +26,23 @@ public class Shutdown implements ICommand<UserContextInteractionEvent> {
     @Override
     public void handle(UserContextInteractionEvent event) {
         event.reply("Shutting down...").setEphemeral(true).complete();
-        event.getInteraction().getHook().deleteOriginal().complete();
         if (event.getJDA().getSelfUser().getId().equals(event.getTarget().getId()) && event.getUser().getId().equals(ID)) {
             try {
+                // Delete all managed messages
+                MessageManager.deleteAllMessages();
+
+                // Perform shutdown tasks
                 AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.stop();
                 ChatMessage.getInstance(event).delete();
-                event.getJDA().shutdown();
+                CommandHandler.shutdown();
 
+                LOGGER.info("Shutting down...");
+                event.getJDA().shutdown();
             } catch (RuntimeException e) {
                 LOGGER.error("Error while shutting down!", e);
+            } finally {
+                System.exit(0);
             }
-
-            LOGGER.info("Shutting down...");
-            System.exit(0);
-
         }
     }
 

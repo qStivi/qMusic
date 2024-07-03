@@ -18,9 +18,30 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            JDA = JDABuilder.createLight(Properties.DISCORD).addEventListeners(new DiscordListeners(), new CommandHandler()).setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.VOICE).setVoiceDispatchInterceptor(new JDAVoiceUpdateListener(Lavalink.getClient())).setActivity(Activity.customStatus("/play")).build();
+            JDA = JDABuilder.createLight(Properties.DISCORD)
+                    .addEventListeners(new DiscordListeners(), new CommandHandler())
+                    .setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
+                    .enableCache(CacheFlag.VOICE_STATE)
+                    .setMemberCachePolicy(MemberCachePolicy.VOICE)
+                    .setVoiceDispatchInterceptor(new JDAVoiceUpdateListener(Lavalink.getClient()))
+                    .setActivity(Activity.customStatus("/play"))
+                    .build();
 
             CommandHandler.updateCommands();
+
+            // Add shutdown hook for graceful shutdown
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    if (JDA != null) {
+                        MessageManager.deleteAllMessages();
+                        JDA.shutdown();
+                    }
+                    CommandHandler.shutdown();
+                    LOGGER.info("Application shutdown gracefully.");
+                } catch (Exception e) {
+                    LOGGER.error("Error during shutdown", e);
+                }
+            }));
         } catch (Exception e) {
             LOGGER.error("Failed to initialize JDA", e);
         }

@@ -44,9 +44,7 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
             Lavalink.getLink(guild.getIdLong()).loadItem(query).subscribe(al);
 
             ChatMessage.getInstance(event).edit("Loading your song!");
-        } catch (Exception
-
-                e) {
+        } catch (Exception e) {
             LOGGER.error("Error handling play command", e);
             event.getHook().editOriginal("Failed to play the song.").queue();
         }

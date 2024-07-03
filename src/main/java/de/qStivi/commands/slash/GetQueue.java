@@ -1,5 +1,6 @@
 package de.qStivi.commands.slash;
 
+import de.qStivi.MessageHandler;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
 import dev.arbjerg.lavalink.client.player.Track;
@@ -36,13 +37,10 @@ public class GetQueue implements ICommand<SlashCommandInteractionEvent> {
             }
         }
 
-        if (sb.isEmpty()) {
-            sb.append("The queue is empty.");
-            event.getHook().editOriginal(sb.toString()).queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
-            return;
-        }
+        String messageContent = sb.isEmpty() ? "The queue is empty." : sb.toString();
+        long deleteAfter = sb.isEmpty() ? 5 : 15;
 
-        event.getHook().editOriginal(sb.toString()).queue((msg) -> msg.delete().queueAfter(15, TimeUnit.MINUTES));
+        MessageHandler.createMessage(event, messageContent, deleteAfter, TimeUnit.MINUTES);
     }
 
     @NotNull
