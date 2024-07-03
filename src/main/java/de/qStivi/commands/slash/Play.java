@@ -2,6 +2,7 @@ package de.qStivi.commands.slash;
 
 import de.qStivi.ChatMessage;
 import de.qStivi.Lavalink;
+import de.qStivi.NoResultsException;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -14,64 +15,59 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Objects;
-
-//TODO There seems to be a bug where a the current song seems to get skipped when a playlist is played while a song is already playing.
 
 public class Play implements ICommand<SlashCommandInteractionEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Play.class);
-
     private static final String QUERY = "query";
-    private static final String RANDOM = "random";
 
-    @NotNull
     @Override
     public CommandData getCommand() {
-        return Commands.slash(getName(), getDescription())
-                .addOption(OptionType.STRING, QUERY, "The thing you want to play (search or link)", true);
+        return Commands.slash(getName(), getDescription()).addOption(OptionType.STRING, QUERY, "The thing you want to play (search or link)", true);
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event) {
-        event.deferReply().complete();
+    public void handle(SlashCommandInteractionEvent event) throws NoResultsException, IOException {
+        try {
+            event.deferReply().complete();
+            if (!ChatMessage.isInstanceNull()) event.getHook().deleteOriginal().queue();
 
-        // Delete message if one already exists
-        if (!ChatMessage.isInstanceNull())
-            event.getHook().deleteOriginal().queue();
+            var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
+            query = validateQuery(query);
 
-        var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
+            var guild = event.getGuild();
+            joinHelper(event);
 
-        // Try parsing as URL and prepend "ytsearch:" if it fails
+            var al = AudioLoader.getInstance(guild.getIdLong());
+            Lavalink.getLink(guild.getIdLong()).loadItem(query).subscribe(al);
+
+            ChatMessage.getInstance(event).edit("Loading your song!");
+        } catch (Exception
+
+                e) {
+            LOGGER.error("Error handling play command", e);
+            event.getHook().editOriginal("Failed to play the song.").queue();
+        }
+    }
+
+    private String validateQuery(String query) {
         try {
             new java.net.URL(query);
         } catch (java.net.MalformedURLException e) {
             query = "ytsearch:" + query;
         }
-
-        var guild = event.getGuild();
-
-        joinHelper(event);
-
-        var al = AudioLoader.getInstance(guild.getIdLong());
-
-        Lavalink.getLink(guild.getIdLong()).loadItem(query).subscribe(al);
-
-        ChatMessage.getInstance(event).edit("Loading your song!");
-
+        return query;
     }
 
-    // Makes sure that the bot is in a voice channel!
     private void joinHelper(SlashCommandInteractionEvent event) {
-        // If the bot is already in a voice channel, return
+        final Member member = event.getMember();
+        final GuildVoiceState memberVoiceState = member.getVoiceState();
+
         if (event.getGuild().getSelfMember().getVoiceState().inAudioChannel()) {
             return;
         }
-
-        // Else join the voice channel of the user
-
-        final Member member = event.getMember();
-        final GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if (memberVoiceState.inAudioChannel()) {
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());

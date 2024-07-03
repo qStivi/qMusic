@@ -34,7 +34,7 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     private static void registerCommands() {
-        registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Resume(), new Stop(), new Loop(), new Shuffle(), new Next(), new GetQueue(), new PlayNow());
+        registerSlashCommands(new Play(), new Pause(), new Skip(), new Resume(), new Stop(), new Loop(), new Shuffle(), new Next(), new GetQueue(), new PlayNow());
         registerUserContextCommands(new Shutdown());
     }
 
