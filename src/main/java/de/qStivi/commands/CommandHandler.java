@@ -18,74 +18,77 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CommandHandler extends ListenerAdapter {
 
-    public static final List<ICommand<SlashCommandInteractionEvent>> SLASH_COMMAND_LIST = new ArrayList<>();
-    public static final List<ICommand<UserContextInteractionEvent>> USER_CONTEXT_INTERACTION_COMMAND_LIST = new ArrayList<>();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
+    private static final List<ICommand<SlashCommandInteractionEvent>> SLASH_COMMAND_LIST = new ArrayList<>();
+    private static final List<ICommand<UserContextInteractionEvent>> USER_CONTEXT_INTERACTION_COMMAND_LIST = new ArrayList<>();
+    private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
     static {
         LOGGER.info("Registering commands.");
+        registerCommands();
+    }
+
+    private static void registerCommands() {
         registerSlashCommands(new Play(), new PlayYoutube(), new Pause(), new Skip(), new Resume(), new Stop(), new Loop(), new Shuffle(), new Next(), new GetQueue(), new PlayNow());
         registerUserContextCommands(new Shutdown());
     }
 
-    public static void updateCommands() {
-        List<CommandData> commandDataList = new ArrayList<>();
-        for (ICommand<SlashCommandInteractionEvent> command : CommandHandler.SLASH_COMMAND_LIST) {
-            commandDataList.add(command.getCommand());
-        }
-        for (ICommand<UserContextInteractionEvent> command : CommandHandler.USER_CONTEXT_INTERACTION_COMMAND_LIST) {
-            commandDataList.add(command.getCommand());
-        }
-        Main.JDA.updateCommands().addCommands(commandDataList).complete();
-    }
-
-    /**
-     * Registers the given commands.
-     *
-     * @param commands The commands to register.
-     */
     private static void registerSlashCommands(ICommand<SlashCommandInteractionEvent>... commands) {
         SLASH_COMMAND_LIST.addAll(Arrays.asList(commands));
     }
 
-    /**
-     * Registers the given commands.
-     *
-     * @param commands The commands to register.
-     */
     private static void registerUserContextCommands(ICommand<UserContextInteractionEvent>... commands) {
         USER_CONTEXT_INTERACTION_COMMAND_LIST.addAll(Arrays.asList(commands));
     }
 
+    public static void updateCommands() {
+        List<CommandData> commandDataList = new ArrayList<>();
+        SLASH_COMMAND_LIST.forEach(command -> commandDataList.add(command.getCommand()));
+        USER_CONTEXT_INTERACTION_COMMAND_LIST.forEach(command -> commandDataList.add(command.getCommand()));
+        Main.JDA.updateCommands().addCommands(commandDataList).complete();
+    }
+
     @Override
     public void onGenericCommandInteraction(@NotNull GenericCommandInteractionEvent event) {
-        // Slash commands
-        for (var command : SLASH_COMMAND_LIST) {
+        if (event instanceof SlashCommandInteractionEvent) {
+            handleSlashCommand((SlashCommandInteractionEvent) event);
+        } else if (event instanceof UserContextInteractionEvent) {
+            handleUserContextCommand((UserContextInteractionEvent) event);
+        }
+    }
+
+    private void handleSlashCommand(SlashCommandInteractionEvent event) {
+        for (ICommand<SlashCommandInteractionEvent> command : SLASH_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-                new Thread(() -> {
+                EXECUTOR.submit(() -> {
                     try {
                         LOGGER.info("{} issued the {} command.", event.getUser().getName(), command.getName());
-                        command.handle((SlashCommandInteractionEvent) event);
+                        command.handle(event);
                     } catch (NoResultsException | IOException e) {
-                        LOGGER.error(e.getMessage());
+                        LOGGER.error(e.getMessage(), e);
                         ChatMessage.getInstance(event, false).edit(e.getMessage());
                     }
-                }).start();
+                });
+                break;
             }
         }
+    }
 
-        // User context commands
-        for (var command : USER_CONTEXT_INTERACTION_COMMAND_LIST) {
+    private void handleUserContextCommand(UserContextInteractionEvent event) {
+        for (ICommand<UserContextInteractionEvent> command : USER_CONTEXT_INTERACTION_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
                 try {
-                    command.handle((UserContextInteractionEvent) event);
+                    command.handle(event);
                 } catch (NoResultsException | IOException e) {
+                    LOGGER.error(e.getMessage(), e);
                     ChatMessage.getInstance(event, true).edit(e.getMessage());
                 }
+                break;
             }
         }
     }
