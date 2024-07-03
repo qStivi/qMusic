@@ -21,7 +21,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     private boolean shuffle = false;
 
     private AudioLoader(Long guildID) {
-        this.mngr = new GuildMusicManager(guildID);
+        this.mngr = GuildMusicManager.getInstance(guildID);
         this.guildID = guildID;
         LOGGER.info("New AudioLoader initialized for guildID: {}", guildID);
     }

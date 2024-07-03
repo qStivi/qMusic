@@ -22,8 +22,8 @@ public class Loop implements ICommand<SlashCommandInteractionEvent> {
     @Override
     public void handle(SlashCommandInteractionEvent event) {
         event.deferReply().complete();
+        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.toggleLoop();
         var isLooping = AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.scheduler.loop;
-        AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.loop();
 
         if (isLooping) {
             event.getHook().editOriginal("Looping enabled.").queue((m) -> m.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
