@@ -1,7 +1,6 @@
 package de.qStivi;
 
 import de.qStivi.commands.CommandHandler;
-import de.qStivi.listener.ControlsManager;
 import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -19,7 +18,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            JDA = JDABuilder.createLight(Properties.DISCORD).addEventListeners(new DiscordListeners(), new ControlsManager(), new CommandHandler()).setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.VOICE).setVoiceDispatchInterceptor(new JDAVoiceUpdateListener(Lavalink.getClient())).setActivity(Activity.customStatus("/play")).build();
+            JDA = JDABuilder.createLight(Properties.DISCORD).addEventListeners(new DiscordListeners(), new CommandHandler()).setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS).enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.VOICE).setVoiceDispatchInterceptor(new JDAVoiceUpdateListener(Lavalink.getClient())).setActivity(Activity.customStatus("/play")).build();
 
             CommandHandler.updateCommands();
         } catch (Exception e) {
