@@ -2,13 +2,12 @@ package de.qStivi;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import javax.annotation.Nullable;
 
 public class ChatMessage {
 
-    public static ChatMessage instance;
+    private static volatile ChatMessage instance;
     private final GenericCommandInteractionEvent event;
     private final Message message;
 
@@ -19,7 +18,11 @@ public class ChatMessage {
 
     public static ChatMessage getInstance(GenericCommandInteractionEvent interactionHook) {
         if (instance == null) {
-            instance = new ChatMessage(interactionHook);
+            synchronized (ChatMessage.class) {
+                if (instance == null) {
+                    instance = new ChatMessage(interactionHook);
+                }
+            }
         }
         return instance;
     }
@@ -30,25 +33,31 @@ public class ChatMessage {
     }
 
     public static ChatMessage getInstance(GenericCommandInteractionEvent hook, boolean ephemeral) {
-        if (instance == null) {
-            instance = new ChatMessage(hook);
-        }
-        instance.event.getHook().setEphemeral(ephemeral);
-        return instance;
+        ChatMessage chatMessage = getInstance(hook);
+        chatMessage.event.getHook().setEphemeral(ephemeral);
+        return chatMessage;
     }
 
     public void edit(String message) {
         if (instance == null) {
             throw new IllegalStateException("Instance is null.");
         }
-        this.message.editMessage(message).complete();
+        try {
+            this.message.editMessage(message).complete();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to edit message", e);
+        }
     }
 
     public void delete() {
         if (instance == null) {
             throw new IllegalStateException("Instance is null.");
         }
-        message.delete().complete();
-        instance = null;
+        try {
+            message.delete().complete();
+            instance = null;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete message", e);
+        }
     }
 }
