@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import static de.qStivi.Util.sendQueue;
+
 public class Shuffle implements ICommand<SlashCommandInteractionEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Shuffle.class);
@@ -45,6 +47,8 @@ public class Shuffle implements ICommand<SlashCommandInteractionEvent> {
         queue.addAll(queueCopy);
 
         event.getHook().editOriginal("Queue shuffled.").queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
+
+        sendQueue(event);
     }
 
     @NotNull

@@ -1,11 +1,8 @@
 package de.qStivi.commands.slash;
 
-import de.qStivi.ChatMessage;
 import de.qStivi.Lavalink;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -15,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+
+import static de.qStivi.Util.joinHelper;
+import static de.qStivi.Util.sendQueue;
 
 public class Play implements ICommand<SlashCommandInteractionEvent> {
 
@@ -34,10 +34,6 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
     public void handle(SlashCommandInteractionEvent event) {
         event.deferReply().complete();
 
-//        // Delete message if one already exists
-//        if (ChatMessage.getInstance() != null)
-//            event.getHook().deleteOriginal().queue();
-
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
 
         // Try parsing as URL and prepend "ytsearch:" if it fails
@@ -51,31 +47,9 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
 
         joinHelper(event);
 
-        var al = AudioLoader.getInstance(guild.getIdLong());
+        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(AudioLoader.getInstance(guild.getIdLong()));
 
-        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
-
-        ChatMessage.getInstance(event).edit("Loading your song!");
-
-    }
-
-    // Makes sure that the bot is in a voice channel!
-    private void joinHelper(SlashCommandInteractionEvent event) {
-        // If the bot is already in a voice channel, return
-        if (event.getGuild().getSelfMember().getVoiceState().inAudioChannel()) {
-            return;
-        }
-
-        // Else join the voice channel of the user
-
-        final Member member = event.getMember();
-        final GuildVoiceState memberVoiceState = member.getVoiceState();
-
-        if (memberVoiceState.inAudioChannel()) {
-            event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
-        }
-
-        ChatMessage.getInstance(event).edit("Joining your channel!");
+        sendQueue(event);
     }
 
     @NotNull

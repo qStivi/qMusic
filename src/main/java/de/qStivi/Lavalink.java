@@ -96,15 +96,11 @@ public class Lavalink {
         int unfilledLength = barLength - filledLength;
 
         // Create the progress bar string
-        StringBuilder progressBar = new StringBuilder();
-        progressBar.append("[");
-        for (int i = 0; i < filledLength; i++) {
-            progressBar.append(filledChar);
-        }
-        for (int i = 0; i < unfilledLength; i++) {
-            progressBar.append(unfilledChar);
-        }
-        progressBar.append("]");
+        String progressBar = "[" +
+                String.valueOf(filledChar).repeat(Math.max(0, filledLength)) +
+                (filledLength > 0 ? ">" : "") +
+                String.valueOf(unfilledChar).repeat(Math.max(0, unfilledLength)) +
+                "]";
 
         // Convert milliseconds to seconds and format time in mm:ss
         String currentTime = formatTime(position / 1000);

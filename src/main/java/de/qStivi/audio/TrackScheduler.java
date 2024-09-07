@@ -51,23 +51,28 @@ public class TrackScheduler {
             java.util.Collections.shuffle(tracks);
         }
 
+
+        queueTracks(tracks, shouldSkipQueue);
+
+        // Start the first track if there is none playing
         if (Lavalink.getCachedPlayer(guildMusicManager.guildId).getTrack() == null) {
-            this.queue.addAll(tracks);
-            this.startTrack(this.queue.poll());
-        } else {
-            // If shouldSkipQueue is true, add the track to the front of the queue
-            if (shouldSkipQueue) {
-                var queueCopy = new LinkedList<>(this.queue);
-                this.queue.clear();
-                this.queue.addAll(tracks);
-                this.queue.addAll(queueCopy);
-                AudioLoader.getInstance(guildMusicManager.guildId).shouldSkipQueue(false);
-                return;
-            }
             this.startTrack(this.queue.poll());
         }
 
         LOGGER.info("Playlist enqueued.");
+    }
+
+    private void queueTracks(List<Track> tracks, boolean shouldSkipQueue) {
+        // If shouldSkipQueue is true, add the track to the front of the queue
+        if (shouldSkipQueue) {
+            var queueCopy = new LinkedList<>(this.queue);
+            this.queue.clear();
+            this.queue.addAll(tracks);
+            this.queue.addAll(queueCopy);
+            AudioLoader.getInstance(guildMusicManager.guildId).shouldSkipQueue(false);
+        } else {
+            this.queue.addAll(tracks);
+        }
     }
 
     public void onTrackStart(Track track) {

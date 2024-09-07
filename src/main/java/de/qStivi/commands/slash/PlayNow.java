@@ -1,12 +1,9 @@
 package de.qStivi.commands.slash;
 
-import de.qStivi.ChatMessage;
 import de.qStivi.Lavalink;
 import de.qStivi.audio.AudioLoader;
 import de.qStivi.commands.ICommand;
-import dev.arbjerg.lavalink.client.player.Track;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -16,7 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+
+import static de.qStivi.Util.joinHelper;
+import static de.qStivi.Util.sendQueue;
 
 public class PlayNow implements ICommand<SlashCommandInteractionEvent> {
 
@@ -30,6 +29,15 @@ public class PlayNow implements ICommand<SlashCommandInteractionEvent> {
         return Commands.slash(getName(), getDescription())
                 .addOption(OptionType.STRING, QUERY, "The thing you want to play (search or link)", true)
                 .addOption(OptionType.BOOLEAN, SHUFFLE, "Shuffle the queue", false);
+    }
+
+    private static void loadSongOrPlaylist(Guild guild, boolean shuffle, String query) {
+        var al = AudioLoader.getInstance(guild.getIdLong());
+        al.shouldSkipQueue(true);
+        al.shouldSkipCurrent(true);
+        al.shuffle(shuffle);
+
+        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
     }
 
     @Override
@@ -51,52 +59,17 @@ public class PlayNow implements ICommand<SlashCommandInteractionEvent> {
 
         joinHelper(event);
 
-        var al = AudioLoader.getInstance(guild.getIdLong());
-        al.shouldSkipQueue(true);
-        al.shouldSkipCurrent(true);
-        al.shuffle(shuffle);
+        loadSongOrPlaylist(guild, shuffle, query);
 
-        Lavalink.get(guild.getIdLong()).loadItem(query).subscribe(al);
-
+        // Wait for the song to be loaded
+        // TODO Do this in a better way
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        event.getHook().editOriginal("Added song to queue! Here are the next 10 songs in the queue.").queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
-
-        StringBuilder sb = new StringBuilder();
-
-        var i = 0;
-        for (Track audioTrack : AudioLoader.getInstance(event.getGuild().getIdLong()).mngr.scheduler.queue) {
-            sb.append(i++).append(". ").append("`").append(audioTrack.getInfo().getTitle()).append("`").append(" by ").append("`").append(audioTrack.getInfo().getAuthor()).append("`").append("\n");
-            if (i == 10) {
-                sb.append("...");
-                break;
-            }
-        }
-
-        event.getChannel().sendMessage(sb.toString()).queue((msg) -> msg.delete().queueAfter(3, TimeUnit.MINUTES));
-    }
-
-    // Makes sure that the bot is in a voice channel!
-    private void joinHelper(SlashCommandInteractionEvent event) {
-        // If the bot is already in a voice channel, return
-        if (event.getGuild().getSelfMember().getVoiceState().inAudioChannel()) {
-            return;
-        }
-
-        // Else join the voice channel of the user
-
-        final Member member = event.getMember();
-        final GuildVoiceState memberVoiceState = member.getVoiceState();
-
-        if (memberVoiceState.inAudioChannel()) {
-            event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
-        }
-
-        ChatMessage.getInstance(event).edit("Joining your channel!");
+        sendQueue(event);
     }
 
     @NotNull
