@@ -88,7 +88,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
     @Override
     public void loadFailed(@NotNull LoadFailed result) {
-        LOGGER.error("Failed to load track: {}", result.getException().getMessage());
+        LOGGER.error("Failed to load track: {}", result.getException());
         ChatMessage.getInstance().edit(result.getException().getMessage());
     }
 

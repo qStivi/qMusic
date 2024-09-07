@@ -2,49 +2,48 @@ package de.qStivi;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ChatMessage {
 
     public static ChatMessage instance;
-    private final GenericCommandInteractionEvent event;
+    private final GenericCommandInteractionEvent interactionHook;
     private final Message message;
 
-    private ChatMessage(GenericCommandInteractionEvent event) {
-        this.event = event;
-        this.message = event.getHook().retrieveOriginal().complete();
+    private ChatMessage(GenericCommandInteractionEvent interactionHook) {
+        this.interactionHook = interactionHook;
+        this.message = interactionHook.getHook().retrieveOriginal().complete();
     }
 
-    public static ChatMessage getInstance(GenericCommandInteractionEvent interactionHook) {
+    public static synchronized ChatMessage getInstance(GenericCommandInteractionEvent interactionHook) {
         if (instance == null) {
+            instance = new ChatMessage(interactionHook);
+        } else if (instance.interactionHook != interactionHook) {
+            instance.delete();
             instance = new ChatMessage(interactionHook);
         }
         return instance;
     }
 
     @Nullable
-    public static ChatMessage getInstance() {
+    public static synchronized ChatMessage getInstance() {
         return instance;
     }
 
-    public static ChatMessage getInstance(GenericCommandInteractionEvent hook, boolean ephemeral) {
-        if (instance == null) {
-            instance = new ChatMessage(hook);
-        }
-        instance.event.getHook().setEphemeral(ephemeral);
+    public static synchronized ChatMessage getInstance(GenericCommandInteractionEvent interactionHook, boolean ephemeral) {
+        instance = getInstance(interactionHook);
+        instance.interactionHook.getHook().setEphemeral(ephemeral);
         return instance;
     }
 
-    public void edit(String message) {
+    public synchronized void edit(String message) {
         if (instance == null) {
             throw new IllegalStateException("Instance is null.");
         }
         this.message.editMessage(message).complete();
     }
 
-    public void delete() {
+    public synchronized void delete() {
         if (instance == null) {
             throw new IllegalStateException("Instance is null.");
         }

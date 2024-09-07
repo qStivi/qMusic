@@ -34,9 +34,9 @@ public class Play implements ICommand<SlashCommandInteractionEvent> {
     public void handle(SlashCommandInteractionEvent event) {
         event.deferReply().complete();
 
-        // Delete message if one already exists
-        if (ChatMessage.getInstance() != null)
-            event.getHook().deleteOriginal().queue();
+//        // Delete message if one already exists
+//        if (ChatMessage.getInstance() != null)
+//            event.getHook().deleteOriginal().queue();
 
         var query = Objects.requireNonNull(event.getOption(QUERY)).getAsString();
 

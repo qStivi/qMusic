@@ -77,7 +77,7 @@ public class PlayNow implements ICommand<SlashCommandInteractionEvent> {
             }
         }
 
-        event.getChannel().sendMessage(sb.toString()).queue((msg) -> msg.delete().queueAfter(15, TimeUnit.MINUTES));
+        event.getChannel().sendMessage(sb.toString()).queue((msg) -> msg.delete().queueAfter(3, TimeUnit.MINUTES));
     }
 
     // Makes sure that the bot is in a voice channel!

@@ -42,7 +42,7 @@ public class GetQueue implements ICommand<SlashCommandInteractionEvent> {
             return;
         }
 
-        event.getHook().editOriginal(sb.toString()).queue((msg) -> msg.delete().queueAfter(15, TimeUnit.MINUTES));
+        event.getHook().editOriginal(sb.toString()).queue((msg) -> msg.delete().queueAfter(3, TimeUnit.MINUTES));
     }
 
     @NotNull

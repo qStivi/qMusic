@@ -52,7 +52,7 @@ public class Lavalink {
             LAVALINK.getLinks().forEach((link) -> {
                 var track = link.getPlayer().block().getTrack();
                 while (track == null) {
-                    LOGGER.debug("Track is null, trying to get the track again...");
+                    // LOGGER.debug("Track is null, trying to get the track again...");
                     track = link.getCachedPlayer().getTrack();
                 }
                 var trackInfo = track.getInfo();
