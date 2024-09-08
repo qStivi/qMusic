@@ -49,8 +49,9 @@ public class Util {
 
         if (sb.isEmpty()) {
             sb.append("The queue is empty!");
+            event.getChannel().sendMessage(sb.toString()).queue((msg) -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+        } else {
+            event.getChannel().sendMessage(sb.toString()).queue((msg) -> msg.delete().queueAfter(3, TimeUnit.MINUTES));
         }
-
-        event.getChannel().sendMessage(sb.toString()).queue((msg) -> msg.delete().queueAfter(3, TimeUnit.MINUTES));
     }
 }

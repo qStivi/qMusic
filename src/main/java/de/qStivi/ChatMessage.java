@@ -9,6 +9,7 @@ public class ChatMessage {
     public static ChatMessage instance;
     private final GenericCommandInteractionEvent interactionHook;
     private final Message message;
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ChatMessage.class);
 
     private ChatMessage(GenericCommandInteractionEvent interactionHook) {
         this.interactionHook = interactionHook;

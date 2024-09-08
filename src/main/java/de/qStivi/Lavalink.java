@@ -53,10 +53,10 @@ public class Lavalink {
                 var track = link.getPlayer().block().getTrack();
                 while (track == null) {
                     // LOGGER.debug("Track is null, trying to get the track again...");
-                    track = link.getCachedPlayer().getTrack();
+                    track = link.getPlayer().block().getTrack();
                 }
                 var trackInfo = track.getInfo();
-                var position = link.getCachedPlayer().getPosition();
+                var position = link.getPlayer().block().getPosition();
                 var duration = trackInfo.getLength();
                 var progressBar = generateProgressBar(position, duration);
 
@@ -115,5 +115,4 @@ public class Lavalink {
         long seconds = timeInSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
-
 }

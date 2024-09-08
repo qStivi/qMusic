@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CommandHandler extends ListenerAdapter {
+    private static volatile boolean shuttingDown = false;
 
     public static final List<ICommand<SlashCommandInteractionEvent>> SLASH_COMMAND_LIST = new ArrayList<>();
     public static final List<ICommand<UserContextInteractionEvent>> USER_CONTEXT_INTERACTION_COMMAND_LIST = new ArrayList<>();
@@ -62,30 +62,59 @@ public class CommandHandler extends ListenerAdapter {
         USER_CONTEXT_INTERACTION_COMMAND_LIST.addAll(Arrays.asList(commands));
     }
 
+    public static void setShuttingDown(boolean shuttingDown) {
+        CommandHandler.shuttingDown = shuttingDown;
+    }
+
+    private static void createThread(@NotNull UserContextInteractionEvent event, ICommand<UserContextInteractionEvent> command, String threadName) {
+        new Thread(() -> {
+            try {
+                LOGGER.info("{} issued the {} command.", event.getUser().getName(), command.getName());
+                command.handle(event);
+            } catch (NoResultsException | IOException e) {
+                LOGGER.error(e.getMessage());
+                ChatMessage.getInstance(event, true).edit(e.getMessage());
+            }
+        }, threadName).start();
+    }
+
+    private static void createThread(@NotNull SlashCommandInteractionEvent event, ICommand<SlashCommandInteractionEvent> command, String threadName) {
+        new Thread(() -> {
+            try {
+                LOGGER.info("{} issued the {} command.", event.getUser().getName(), command.getName());
+                command.handle(event);
+            } catch (NoResultsException | IOException e) {
+                LOGGER.error(e.getMessage());
+                ChatMessage.getInstance(event, false).edit(e.getMessage());
+            }
+        }, threadName).start();
+    }
+
     @Override
     public void onGenericCommandInteraction(@NotNull GenericCommandInteractionEvent event) {
+        // Check if the bot is shutting down
+        if (shuttingDown) {
+            LOGGER.info("Command execution skipped: bot is shutting down.");
+            return; // Skip execution if shutting down
+        }
+
         // Slash commands
         for (var command : SLASH_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-                new Thread(() -> {
-                    try {
-                        LOGGER.info("{} issued the {} command.", event.getUser().getName(), command.getName());
-                        command.handle((SlashCommandInteractionEvent) event);
-                    } catch (NoResultsException | IOException e) {
-                        LOGGER.error(e.getMessage());
-                        ChatMessage.getInstance(event, false).edit(e.getMessage());
-                    }
-                }).start();
+                var threadName = "CommandThread-" + command.getName();
+                createThread((SlashCommandInteractionEvent) event, command, threadName);
             }
         }
 
         // User context commands
         for (var command : USER_CONTEXT_INTERACTION_COMMAND_LIST) {
             if (command.getCommand().getName().equals(event.getName())) {
-                try {
-                    command.handle((UserContextInteractionEvent) event);
-                } catch (NoResultsException | IOException e) {
-                    ChatMessage.getInstance(event, true).edit(e.getMessage());
+                var threadName = "CommandThread-" + command.getName();
+                if (event.getName().equals("Shutdown")) {
+                    threadName = "ShutdownThread-" + command.getName();
+                    createThread((UserContextInteractionEvent) event, command, threadName);
+                } else {
+                    createThread((UserContextInteractionEvent) event, command, threadName);
                 }
             }
         }
