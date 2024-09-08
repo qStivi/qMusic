@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 
 // TODO what happens when the bot is added to a guild while its running?
+
 public class Main {
 
     public static JDA JDA;
