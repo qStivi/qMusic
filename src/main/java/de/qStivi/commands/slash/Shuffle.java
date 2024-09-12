@@ -46,7 +46,7 @@ public class Shuffle implements ICommand<SlashCommandInteractionEvent> {
         queue.clear();
         queue.addAll(queueCopy);
 
-        event.getHook().editOriginal("Queue shuffled.").queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
+        event.getChannel().sendMessage("Queue shuffled.").queue((msg) -> msg.delete().queueAfter(5, TimeUnit.SECONDS));
 
         sendQueue(event);
     }
