@@ -76,6 +76,7 @@ cmake-build-*/
 
 # IntelliJ
 out/
+/.idea/codeStyles/codeStyleConfig.xml
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
