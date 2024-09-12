@@ -85,6 +85,11 @@
             <version>1.5.7</version>
         </dependency>
         <!-- endregion -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.10.2</version>
+        </dependency>
     </dependencies>
 
     <build>
