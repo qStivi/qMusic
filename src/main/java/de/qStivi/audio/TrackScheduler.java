@@ -88,7 +88,7 @@ public class TrackScheduler {
             // Loop the last track if loop is enabled
             if (this.loop) {
                 LOGGER.info("Looping last track: {}", lastTrack.getInfo().getTitle());
-                this.startTrack(lastTrack);
+                this.startTrack(lastTrack.makeClone()); // Has to be cloned bc original track has already ended
                 return;
             }
 

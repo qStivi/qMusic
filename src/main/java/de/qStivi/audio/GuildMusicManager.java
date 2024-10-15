@@ -2,6 +2,7 @@ package de.qStivi.audio;
 
 import de.qStivi.ChatMessage;
 import de.qStivi.Lavalink;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -61,10 +62,17 @@ public class GuildMusicManager {
         LOGGER.info("Continued to play.");
     }
 
-    public void loop() {
+    public void toggleLoop(SlashCommandInteractionEvent event) {
         LOGGER.info("Toggling loop...");
         this.scheduler.loop = !this.scheduler.loop;
-        // TODO: Send a message to the user that the loop state has changed
+
+
+        if (scheduler.loop) {
+            event.getHook().editOriginal("Looping enabled.").queue((m) -> m.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
+        } else {
+            event.getHook().editOriginal("Looping disabled.").queue((m) -> m.delete().queueAfter(5, java.util.concurrent.TimeUnit.SECONDS));
+        }
+
         LOGGER.info("Loop toggled.");
     }
 }
