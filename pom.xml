@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>4.28.2</version>
+            <version>4.28.3</version>
         </dependency>
 
 
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>dev.arbjerg</groupId>
             <artifactId>lavalink-client</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.0</version>
         </dependency>
         <!-- https://github.com/lavalink-devs/youtube-source/releases -->
         <!-- DON'T FORGET TO UPDATE VERSION IN SERVER CONFIG -->
@@ -67,7 +67,7 @@
         </dependency>
         <!-- endregion -->
 
-        <!-- region dotenv-java https://github.com/cdimascio/dotenv-java/releases-->
+        <!-- region dotenv-java https://github.com/cdimascio/dotenv-java/releases -->
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
@@ -75,7 +75,7 @@
         </dependency>
         <!-- endregion -->
 
-        <!-- region Spotify https://github.com/spotify-web-api-java/spotify-web-api-java/releases-->
+        <!-- region Spotify https://github.com/spotify-web-api-java/spotify-web-api-java/releases -->
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
             <artifactId>spotify-web-api-java</artifactId>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.11.2</version>
+            <version>5.11.3</version>
             <scope>test</scope>
         </dependency>
         <!-- endregion -->
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.10</version>
+            <version>1.5.12</version>
         </dependency>
         <!-- endregion -->
     </dependencies>
@@ -111,6 +111,7 @@
             </resource>
         </resources>
         <plugins>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -121,6 +122,7 @@
                     </archive>
                 </configuration>
             </plugin>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
