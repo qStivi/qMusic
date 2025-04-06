@@ -66,15 +66,15 @@ jobs:
         with:
           args: "🚀 New release: [Build ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/auto-release-${{ github.run_id }})"
 
-      - name: Send email notification if build fails
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.example.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USER }}
-          password: ${{ secrets.EMAIL_PASS }}
-          subject: "🚨 Build Failed: qMusic"
-          body: "The latest build of qMusic failed. Check logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          to: "your-email@example.com"
-          from: "github-actions@example.com"
+#      - name: Send email notification if build fails
+#        if: failure()
+#        uses: dawidd6/action-send-mail@v3
+#        with:
+#          server_address: smtp.example.com
+#          server_port: 587
+#          username: ${{ secrets.EMAIL_USER }}
+#          password: ${{ secrets.EMAIL_PASS }}
+#          subject: "🚨 Build Failed: qMusic"
+#          body: "The latest build of qMusic failed. Check logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+#          to: "your-email@example.com"
+#          from: "github-actions@example.com"
