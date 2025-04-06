@@ -1,10 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "maven"
-    directory: "/"
+    directory: "/" # Location of pom.xml
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 1  # Limit to one PR
+    open-pull-requests-limit: 1
     assignees:
       - "qStivi"
     reviewers:
@@ -15,8 +15,7 @@ updates:
       prefix: "deps"
     pull-request-branch-name:
       separator: "-"
-    versioning-strategy: increase
     groups:
-      dependencies:
+      all-deps:
         patterns:
-          - "*"  # Groups all dependencies into one PR
+          - "*"
