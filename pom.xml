@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>4.29.2</version>
+            <version>4.30.2</version>
         </dependency>
 
 
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>dev.lavalink.youtube</groupId>
             <artifactId>common</artifactId>
-            <version>1.11.5</version>
+            <version>1.12.0</version>
         </dependency>
         <!-- endregion -->
 
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.0</version>
         </dependency>
         <!-- endregion -->
 
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
             <artifactId>spotify-web-api-java</artifactId>
-            <version>9.1.0</version>
+            <version>9.2.0</version>
         </dependency>
         <!-- endregion -->
 
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.11.4</version>
+            <version>5.12.1</version>
             <scope>test</scope>
         </dependency>
         <!-- endregion -->
