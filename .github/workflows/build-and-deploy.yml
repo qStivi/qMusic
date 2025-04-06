@@ -25,27 +25,36 @@ jobs:
         run: mvn clean package
 
       - name: Send Discord notification (build started)
+        if: env.DISCORD_WEBHOOK != ''
         uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: "🛠️ Build started for qMusic..."
-
+      
       - name: Send Discord notification (build success)
-        if: success()
+        if: success() && env.DISCORD_WEBHOOK != ''
         uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: "✅ Build successful! New release incoming..."
-
+      
       - name: Send Discord notification (build failed)
-        if: failure()
+        if: failure() && env.DISCORD_WEBHOOK != ''
         uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: "❌ Build failed! Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      
+      - name: Send Discord notification (release created)
+        if: env.DISCORD_WEBHOOK != ''
+        uses: Ilshidur/action-discord@v2.0.0
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: "🚀 New release: [Build ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/auto-release-${{ github.run_id }})"
 
       - name: Create release
         id: create_release
