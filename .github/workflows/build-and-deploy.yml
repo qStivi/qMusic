@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    types:
+      - closed  # Triggers build when a PR is merged
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -22,30 +24,57 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      - name: Get date and time for version
-        id: get_datetime
-        run: |
-          datetime=$(date +'%Y-%m-%d_%H-%M')
-          echo "datetime=$datetime" >> $GITHUB_ENV
+      - name: Send Discord notification (build started)
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: "🛠️ Build started for qMusic..."
+
+      - name: Send Discord notification (build success)
+        if: success()
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: "✅ Build successful! New release incoming..."
+
+      - name: Send Discord notification (build failed)
+        if: failure()
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: "❌ Build failed! Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: auto-release-${{ env.datetime }}
-          name: "Automated Release ${{ env.datetime }}"
+          tag: auto-release-${{ github.run_id }}
+          name: "Automated Release ${{ github.run_id }}"
           draft: false
           prerelease: false
-          body: "Automated release generated on ${{ env.datetime }}"
+          body: "Automated release generated from CI build."
           token: ${{ secrets.MY_GITHUB_TOKEN }}
           generateReleaseNotes: true
-      
-      - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/MusicBot-1-jar-with-dependencies-jar-with-dependencies.jar
-          asset_name: qMusic.jar
-          asset_content_type: application/java-archive
+
+      - name: Send Discord notification (release created)
+        uses: Ilshidur/action-discord@master
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: "🚀 New release: [Build ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/auto-release-${{ github.run_id }})"
+
+      - name: Send email notification if build fails
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.example.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "🚨 Build Failed: qMusic"
+          body: "The latest build of qMusic failed. Check logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          to: "your-email@example.com"
+          from: "github-actions@example.com"
