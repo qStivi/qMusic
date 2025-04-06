@@ -50,7 +50,7 @@ jobs:
       
       - name: Send Discord notification (release created)
         if: env.DISCORD_WEBHOOK != ''
-        uses: Ilshidur/action-discord@v2.0.0
+        uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
