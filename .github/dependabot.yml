@@ -1,21 +1,12 @@
+# .github/dependabot.yml
 version: 2
 updates:
   - package-ecosystem: "maven"
-    directory: "/" # Location of pom.xml
+    directory: "/"             # Path to pom.xml
     schedule:
       interval: "daily"
     open-pull-requests-limit: 1
-    assignees:
-      - "qStivi"
-    reviewers:
-      - "qStivi"
-    labels:
-      - "dependencies"
-    commit-message:
-      prefix: "deps"
-    pull-request-branch-name:
-      separator: "-"
     groups:
       all-deps:
         patterns:
-          - "*"
+          - "*"                # Group *all* dependency updates into one PR

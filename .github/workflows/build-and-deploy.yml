@@ -1,22 +1,24 @@
+# .github/workflows/build-and-deploy.yml
 name: Build and Deploy
 
 on:
   push:
-    branches:
-      - master
+    branches: [ main ]        # Trigger on pushes to the main branch
   pull_request:
-    types:
-      - closed  # Triggers build when a PR is merged
+    types: [ closed ]        # Trigger when a PR is merged (closed with merge)
 
 jobs:
   build:
+    # Only run on merges or direct pushes (avoid duplicate run on PR close without merge)
+    if: ${{ github.event.pull_request == null || github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '22'
@@ -24,39 +26,7 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      - name: Send Discord notification (build started)
-        if: env.DISCORD_WEBHOOK != ''
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        with:
-          args: "🛠️ Build started for qMusic..."
-      
-      - name: Send Discord notification (build success)
-        if: success() && env.DISCORD_WEBHOOK != ''
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        with:
-          args: "✅ Build successful! New release incoming..."
-      
-      - name: Send Discord notification (build failed)
-        if: failure() && env.DISCORD_WEBHOOK != ''
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        with:
-          args: "❌ Build failed! Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-      
-      - name: Send Discord notification (release created)
-        if: env.DISCORD_WEBHOOK != ''
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        with:
-          args: "🚀 New release: [Build ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/auto-release-${{ github.run_id }})"
-
-      - name: Create release
+      - name: Create GitHub Release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
@@ -64,26 +34,6 @@ jobs:
           name: "Automated Release ${{ github.run_id }}"
           draft: false
           prerelease: false
-          body: "Automated release generated from CI build."
-          token: ${{ secrets.MY_GITHUB_TOKEN }}
           generateReleaseNotes: true
-
-      - name: Send Discord notification (release created)
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        with:
-          args: "🚀 New release: [Build ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/auto-release-${{ github.run_id }})"
-
-#      - name: Send email notification if build fails
-#        if: failure()
-#        uses: dawidd6/action-send-mail@v3
-#        with:
-#          server_address: smtp.example.com
-#          server_port: 587
-#          username: ${{ secrets.EMAIL_USER }}
-#          password: ${{ secrets.EMAIL_PASS }}
-#          subject: "🚨 Build Failed: qMusic"
-#          body: "The latest build of qMusic failed. Check logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-#          to: "your-email@example.com"
-#          from: "github-actions@example.com"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          assets: "target/qMusic.jar"   # Adjust path to the built JAR artifact
