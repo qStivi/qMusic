@@ -26,8 +26,13 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
+      - name: List target directory
+        run: ls -lh target
+
+      - name: Rename jar for release
+        run: mv target/qMusic-jar-with-dependencies.jar target/qMusic.jar
+
       - name: Create GitHub Release
-        id: create_release
         uses: ncipollo/release-action@v1
         with:
           tag: auto-release-${{ github.run_id }}
@@ -36,4 +41,5 @@ jobs:
           prerelease: false
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "target/qMusic.jar"
+          artifacts: target/qMusic.jar
+
