@@ -3,7 +3,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]        # Trigger on pushes to the main branch
+    branches: [ master, main ]        # Trigger on pushes to the main branch
   pull_request:
     types: [ closed ]        # Trigger when a PR is merged (closed with merge)
 
