@@ -36,4 +36,4 @@ jobs:
           prerelease: false
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          assets: "target/qMusic.jar"   # Adjust path to the built JAR artifact
+          artifacts: "target/qMusic.jar"
