@@ -134,7 +134,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>MusicBot-1-jar-with-dependencies</finalName>
+                    <finalName>qMusic</finalName>
                 </configuration>
                 <executions>
                     <execution>
