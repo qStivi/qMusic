@@ -40,6 +40,6 @@ jobs:
           draft: false
           prerelease: false
           generateReleaseNotes: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
           artifacts: target/qMusic.jar
 
