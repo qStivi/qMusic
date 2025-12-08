@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>4.31.1</version>
+            <version>4.33.2</version>
         </dependency>
 
 
@@ -56,14 +56,14 @@
         <dependency>
             <groupId>dev.arbjerg</groupId>
             <artifactId>lavalink-client</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.0</version>
         </dependency>
         <!-- https://github.com/lavalink-devs/youtube-source/releases -->
         <!-- DON'T FORGET TO UPDATE VERSION IN SERVER CONFIG -->
         <dependency>
             <groupId>dev.lavalink.youtube</groupId>
             <artifactId>common</artifactId>
-            <version>1.13.2</version>
+            <version>1.16.0</version>
         </dependency>
         <!-- endregion -->
 
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
             <artifactId>spotify-web-api-java</artifactId>
-            <version>9.2.0</version>
+            <version>9.4.0</version>
         </dependency>
         <!-- endregion -->
 
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.12.2</version>
+            <version>6.0.1</version>
             <scope>test</scope>
         </dependency>
         <!-- endregion -->
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
+            <version>1.5.21</version>
         </dependency>
         <!-- endregion -->
     </dependencies>
@@ -115,7 +115,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>3.5.0</version>
                 <configuration>
                     <archive>
                         <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
@@ -126,7 +126,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.7.1</version>
+                <version>3.8.0</version>
                 <configuration>
                     <archive>
                         <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
